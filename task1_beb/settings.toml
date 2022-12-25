@@ -1,0 +1,11 @@
+[robot_info]
+serial_number = ''
+production_date = ''
+type = ''
+
+[mqtt]
+host = 'test.mosquitto.org'
+port = '1883'
+username = ''
+password = ''
+topic = 'task1_beb'
