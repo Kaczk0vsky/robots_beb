@@ -1,6 +1,9 @@
 from datetime import datetime
 from dataclasses import dataclass
-from task1_beb.main import initialization
+from paho.mqtt import client as mqtt
+from task1_beb.settings_reader import mqtt_settings
+from task1_beb.mqtt_communication import on_connect, on_disconnect, on_message
+import logging
 
 
 @dataclass
@@ -17,7 +20,19 @@ class RobotLocation:
     latitude: float
     longitude: float
 
-if __name__ == "__main__":
-    initialization()
-    while True:
-        print("1")
+
+# Initializing Logger console info
+logger = logging.getLogger(__name__)
+
+# Initializing MQTT communication
+client = mqtt.Client()
+mqqt_config = mqtt_settings()
+
+if "username" in mqqt_config:
+    client.username_pw_set(mqqt_config["username"], password = mqqt_config["password"])
+client.on_connect = on_connect
+client.on_disconnect = on_disconnect
+client.connect(mqqt_config["host"], int(mqqt_config["port"]))
+
+# TODO: Add threading
+# client.loop_forever()
