@@ -1,5 +1,6 @@
 from paho.mqtt import client as mqtt
 from task1_beb.settings_reader import mqtt_settings
+from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -29,4 +30,7 @@ def on_publish():
 
 
 def on_subscribe():
+    pass
+
+def send_data():
     pass
