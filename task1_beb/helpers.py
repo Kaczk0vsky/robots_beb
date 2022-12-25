@@ -5,6 +5,7 @@ from datetime import datetime
 from dataclasses import dataclass
 import logging
 import django
+import threading
 
 
 @dataclass
@@ -39,8 +40,13 @@ def initialization():
     client.on_disconnect = on_disconnect
     client.connect(mqqt_config["host"], int(mqqt_config["port"]))
 
-    # TODO: Add threading
-    # client.loop_forever()
+    # Starting threading
+    threads = []
+    threads.append(threading.Thread(target=client.loop_forever, daemon=True))
+
+    for thread in threads:
+        thread.start()
+
 
 # if __name__ == "__main__":
 #     initialization()
