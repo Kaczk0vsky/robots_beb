@@ -1,3 +1,4 @@
+from task1_beb.settings_reader import robot_info
 import datetime
 import random
 
@@ -27,3 +28,7 @@ def update_data():
     robot_location["timestamp"] = datetime.datetime.now()
     robot_location["latitude"] = random.randint(0, 90)
     robot_location["longitude"] = random.randint(0, 90)
+
+def make_robot_info():
+    robot = robot_info()
+    return f'Robot {robot["serial_number"]} - {robot["production_date"]}. Type: {robot["type"]} - '

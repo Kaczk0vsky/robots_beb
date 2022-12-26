@@ -1,7 +1,7 @@
 [robot_info]
-serial_number = ''
-production_date = ''
-type = ''
+serial_number = 'R000001-37DH'
+production_date = '26.12.2022'
+type = 'flying'
 
 [mqtt]
 host = 'test.mosquitto.org'

@@ -1,12 +1,13 @@
 from paho.mqtt import client as mqtt
 from task1_beb.settings_reader import mqtt_settings
 from datetime import datetime
-from task1_beb.helpers import time_in_seconds, robot_location, robot_telemetry, update_data
+from task1_beb.helpers import time_in_seconds, robot_location, robot_telemetry, update_data, make_robot_info
 import logging
 
 logger = logging.getLogger(__name__)
 mqqt_config = mqtt_settings()
 client = mqtt.Client()
+name = make_robot_info()
 
 
 class TimeMessure:
@@ -34,24 +35,24 @@ def on_connect(client, userdata, flags, rc):
     error_count = 0
     while error_count <= 5:
         if rc == 0:
-            logger.info("Connected to MQTT Server.")
+            logger.info(name + "Connected to MQTT Server.")
             break
         else:
-            logger.error("Cannot connect to MQTT Server - return code %d\n", rc)
+            logger.error(name + "Cannot connect to MQTT Server - return code %d\n", rc)
             error_count = error_count + 1
         if error_count == 5:
-            return logger.info("Couldn`t connect to MQTT Server after several tries")
+            return logger.info(name + "Couldn`t connect to MQTT Server after several tries")
 
     client.on_connect = on_connect
     return client
 
 def on_disconnect(client, userdata, flags, rc):
-    logger.info("Disconnected from MQTT Server. Trying to reconnect...")
+    logger.info(name + "Disconnected from MQTT Server. Trying to reconnect...")
     while rc != 0:
         client.connect(mqqt_config["host"], int(mqqt_config["port"]))
 
 def send_data():
-    logger.info(f'Sent robot parameters on topic {mqqt_config["topic"]}.')
+    logger.info(name + f'Sent robot parameters on topic {mqqt_config["topic"]}.')
     client.publish(f'{mqqt_config["topic"]}/robot_telemetry/timestamp', str(robot_telemetry["timestamp"]))
     client.publish(f'{mqqt_config["topic"]}/robot_telemetry/humidity', robot_telemetry["humidity"])
     client.publish(f'{mqqt_config["topic"]}/robot_telemetry/temperature', robot_telemetry["temperature"])
