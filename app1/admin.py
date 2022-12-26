@@ -1,5 +1,4 @@
 from django.contrib import admin
+from .models import Robot
 
-from .models import Question
-
-admin.site.register(Question)
+admin.site.register(Robot)
