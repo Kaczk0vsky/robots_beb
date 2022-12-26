@@ -1,7 +1,7 @@
 from paho.mqtt import client as mqtt
 from task1_beb.settings_reader import mqtt_settings
 from datetime import datetime
-from task1_beb.helpers import time_in_seconds, robot_location, robot_telemetry
+from task1_beb.helpers import time_in_seconds, robot_location, robot_telemetry, update_data
 import logging
 
 logger = logging.getLogger(__name__)
@@ -17,6 +17,7 @@ class TimeMessure:
     def loop_forever(self):
         while True:
             if self.interval_time <= time_in_seconds(datetime.now() - self.start_time):
+                update_data()
                 send_data()
                 self.start_time = datetime.now()
 
@@ -26,7 +27,6 @@ def mqtt_init():
         client.username_pw_set(mqqt_config["username"], password = mqqt_config["password"])
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
-    client.on_message = on_message
     client.connect(mqqt_config["host"], int(mqqt_config["port"]))
     client.subscribe(mqqt_config["topic"], 1)
 
@@ -50,14 +50,15 @@ def on_disconnect(client, userdata, flags, rc):
     while rc != 0:
         client.connect(mqqt_config["host"], int(mqqt_config["port"]))
 
-
-def on_message(client, userdata, message, tmp=None):
-    logger.info("Received message " + str(message.payload)
-                + " on topic '" + message.topic
-                + "' with QoS " + str(message.qos))
-
 def send_data():
-    client.publish(mqqt_config["topic"], robot_telemetry["humidity"])
+    logger.info(f'Sent robot parameters on topic {mqqt_config["topic"]}.')
+    client.publish(f'{mqqt_config["topic"]}/robot_telemetry/timestamp', str(robot_telemetry["timestamp"]))
+    client.publish(f'{mqqt_config["topic"]}/robot_telemetry/humidity', robot_telemetry["humidity"])
+    client.publish(f'{mqqt_config["topic"]}/robot_telemetry/temperature', robot_telemetry["temperature"])
+    client.publish(f'{mqqt_config["topic"]}/robot_telemetry/pressure', robot_telemetry["pressure"])
+    client.publish(f'{mqqt_config["topic"]}/robot_location/timestamp', str(robot_location["timestamp"]))
+    client.publish(f'{mqqt_config["topic"]}/robot_location/latitude', robot_location["latitude"])
+    client.publish(f'{mqqt_config["topic"]}/robot_location/longitude', robot_location["longitude"])
 
 def mqtt_loop_forever():
     client.loop_forever()

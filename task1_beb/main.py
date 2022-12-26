@@ -1,6 +1,4 @@
-from paho.mqtt import client as mqtt
-from task1_beb.mqtt_communication import on_connect, on_disconnect, on_message, TimeMessure, mqtt_init, mqtt_loop_forever
-from datetime import datetime
+from task1_beb.mqtt_communication import on_connect, on_disconnect, TimeMessure, mqtt_init, mqtt_loop_forever
 import logging
 import django
 import threading
