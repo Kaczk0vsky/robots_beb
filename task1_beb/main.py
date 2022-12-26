@@ -1,4 +1,4 @@
-from task1_beb.mqtt_communication import on_connect, on_disconnect, TimeMessure, mqtt_init, mqtt_loop_forever
+from task1_beb.mqtt_communication import TimeMessure, mqtt_init, mqtt_loop_forever
 import logging
 import django
 import threading
@@ -22,6 +22,3 @@ def initialization():
 
     for thread in threads:
         thread.start()
-
-# if __name__ == "__main__":
-#     initialization()
