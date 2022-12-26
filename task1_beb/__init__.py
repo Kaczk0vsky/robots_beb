@@ -1,3 +1,3 @@
-from task1_beb.helpers import initialization
+from task1_beb.main import initialization
 
 initialization()

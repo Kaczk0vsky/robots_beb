@@ -1,28 +1,34 @@
 from paho.mqtt import client as mqtt
 from task1_beb.settings_reader import mqtt_settings
 from datetime import datetime
+from task1_beb.helpers import time_in_seconds, robot_location, robot_telemetry
 import logging
 
 logger = logging.getLogger(__name__)
 mqqt_config = mqtt_settings()
+client = mqtt.Client()
 
 
-class MQTTTimeMessure:
+class TimeMessure:
     def __init__(self):
         self.start_time = datetime.now()
         self.interval_time = int(mqqt_config["interval_time"])
 
     def loop_forever(self):
         while True:
-            time_delta = datetime.now() - self.start_time
-            hours = time_delta.seconds // 3600
-            minutes = time_delta.seconds // 60 - hours * 60
-            seconds = time_delta.seconds - minutes * 60 - hours * 3600
-            time_delta = f"{hours}:{minutes}:{seconds}"
-            if self.interval_time <= time_delta:
-                logger.info("5")
+            if self.interval_time <= time_in_seconds(datetime.now() - self.start_time):
+                send_data()
                 self.start_time = datetime.now()
 
+
+def mqtt_init():
+    if "username" in mqqt_config:
+        client.username_pw_set(mqqt_config["username"], password = mqqt_config["password"])
+    client.on_connect = on_connect
+    client.on_disconnect = on_disconnect
+    client.on_message = on_message
+    client.connect(mqqt_config["host"], int(mqqt_config["port"]))
+    client.subscribe(mqqt_config["topic"], 1)
 
 def on_connect(client, userdata, flags, rc):
     error_count = 0
@@ -51,4 +57,7 @@ def on_message(client, userdata, message, tmp=None):
                 + "' with QoS " + str(message.qos))
 
 def send_data():
-    logger.info("now")
+    client.publish(mqqt_config["topic"], robot_telemetry["humidity"])
+
+def mqtt_loop_forever():
+    client.loop_forever()
