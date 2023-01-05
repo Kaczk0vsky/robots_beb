@@ -45,7 +45,7 @@ def update_data():
                       location_latitude = robot_location["latitude"],
                       location_longitude = robot_location["longitude"],
                       )
-    new_robot.save()
+    # new_robot.save()
         
 
 def make_robot_info():
@@ -54,5 +54,8 @@ def make_robot_info():
 
 def add_robot():
     robot = robot_info()
-    new_robot = Robot(serial_number = robot["serial_number"], production_date = robot["production_date"], type = robot["type"], company = robot["company"])
-    new_robot.save()
+    if Robot.objects.filter(serial_number = robot["serial_number"]).exists():
+        pass
+    else:
+        new_robot = Robot(serial_number = robot["serial_number"], production_date = robot["production_date"], type = robot["type"], company = robot["company"])
+        new_robot.save()
