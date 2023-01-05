@@ -1,5 +1,3 @@
-import datetime
-
 from django.db import models
 from django.utils import timezone
 
@@ -23,6 +21,15 @@ class Robot(models.Model):
         default = '4 wheeler'
     )
     company = models.CharField(max_length = 20)
+
+    #Hidden params
+    telemetry_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    telemetry_humidity = models.CharField(max_length=5, default=0, editable=False)
+    telemetry_temperature = models.CharField(max_length=5, default=0, editable=False)
+    telemetry_pressure = models.CharField(max_length=5, default=0, editable=False)
+    location_timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    location_latitude = models.CharField(max_length=5, default=0, editable=False)
+    location_longitude = models.CharField(max_length=5, default=0, editable=False)
 
     def __str__(self):
         return self.serial_number

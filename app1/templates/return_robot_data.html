@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<p>Returned all robots data:</p>
+
+<table border='1'>
+  {% for x in robots %}
+    <tr>
+      <td>{{ x.telemetry_timestamp }}</td>
+    </tr>
+  {% endfor %}
+</table>
+
+</body>
+</html>  
