@@ -15,7 +15,7 @@ class Robot(models.Model):
         (TRACKED, ('tracked')),
         (FLYING, ('flying')),
     ]
-    serial_number = models.CharField(max_length = 50)
+    serial_number = models.CharField(max_length = 50, unique=True)
     production_date = models.DateField()
     type = models.CharField(
         max_length = 10,

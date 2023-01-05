@@ -1,4 +1,11 @@
+import os
+import django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task1_beb.settings")
+django.setup()
+
 from task1_beb.settings_reader import robot_info
+from django.conf import settings
+from app1.models import Robot
 import datetime
 import random
 
@@ -32,3 +39,8 @@ def update_data():
 def make_robot_info():
     robot = robot_info()
     return f'Robot {robot["serial_number"]} - {robot["production_date"]}. Type: {robot["type"]} - '
+
+def add_robot():
+    robot = robot_info()
+    new_robot = Robot(serial_number = robot["serial_number"], production_date = robot["production_date"], type = robot["type"], company = robot["company"])
+    new_robot.save()

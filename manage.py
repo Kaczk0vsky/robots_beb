@@ -4,7 +4,6 @@ import os
 import sys
 from task1_beb.main import initialization
 
-
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'task1_beb.settings')

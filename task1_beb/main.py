@@ -1,16 +1,16 @@
 from task1_beb.mqtt_communication import TimeMessure, mqtt_init, mqtt_loop_forever
+from task1_beb.helpers import add_robot
 import logging
-import django
 import threading
 
 
 def initialization():
-    # Setting up Django
-    django.setup()
+    #Add new robot
+    add_robot()
 
     # Initializing Logger console info
     logger = logging.getLogger(__name__)
-
+    
     # Initializing MQTT communication
     mqtt_init()
     

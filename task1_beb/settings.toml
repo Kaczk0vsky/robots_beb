@@ -1,7 +1,8 @@
 [robot_info]
-serial_number = 'R000001-37DH'
-production_date = '26.12.2022'
+serial_number = '00004'
+production_date = '2022-12-26'
 type = 'flying'
+company = 'EcoTruck'
 
 [mqtt]
 host = 'test.mosquitto.org'
