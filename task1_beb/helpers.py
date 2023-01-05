@@ -37,14 +37,14 @@ def update_data():
     robot_location["latitude"] = random.randint(0, 90)
     robot_location["longitude"] = random.randint(0, 90)
 
-    new_robot = Robot   (telemetry_timestamp = robot_telemetry["timestamp"], 
-                        telemetry_humidity = robot_telemetry["humidity"],
-                        telemetry_temperature = robot_telemetry["temperature"],
-                        telemetry_pressure = robot_telemetry["pressure"],
-                        location_timestamp = robot_location["timestamp"],
-                        location_latitude = robot_location["latitude"],
-                        location_longitude = robot_location["longitude"],
-                        )
+    new_robot = Robot(telemetry_timestamp = robot_telemetry["timestamp"], 
+                      telemetry_humidity = robot_telemetry["humidity"],
+                      telemetry_temperature = robot_telemetry["temperature"],
+                      telemetry_pressure = robot_telemetry["pressure"],
+                      location_timestamp = robot_location["timestamp"],
+                      location_latitude = robot_location["latitude"],
+                      location_longitude = robot_location["longitude"],
+                      )
     new_robot.save()
         
 
