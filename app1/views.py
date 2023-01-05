@@ -1,19 +1,15 @@
-import json
-
-from django.core import serializers
-from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from app1.models import Robot
-from django.forms.models import model_to_dict
+from django.template import loader
 
 
 def ReturnAllRobots(request):
-    data = {
-        'type': Robot.type,
-        'company': Robot.company,
-    }
+    robot_data = Robot.objects.all().values()
+    template = loader.get_template('return_all.html')
 
-    data['type'] = model_to_dict(data['type'])
-    data['company'] = model_to_dict(data['company'])
-    return HttpResponse(json.simplejson.dumps(data), mimetype="application/json")
+    data = {
+        'robots': robot_data,
+    }
+    
+    return HttpResponse(template.render(data, request))
     
