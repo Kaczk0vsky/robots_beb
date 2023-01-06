@@ -34,3 +34,20 @@ def AddNewRobot(request):
     else:
         form = NewRobot()
     return render(request, 'add_new.html')
+
+def ReturnTelemetry(request):
+    robot_data = Robot.objects.all().values()
+    template = loader.get_template('return_telemetry.html')
+    data = {
+        'robots': robot_data,
+    }
+    return HttpResponse(template.render(data, request))
+
+def ReturnLocation(request):
+    pass
+
+def ReturnLatestLocationOfAll(request):
+    pass
+
+def ModifyRobotBrand(request):
+    pass
