@@ -1,6 +1,8 @@
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from app1.models import Robot
 from django.template import loader
+from django.shortcuts import render
+from app1.forms import NewRobot
 
 
 def ReturnAllRobots(request):
@@ -22,3 +24,13 @@ def ReturnRobotData(request):
     }
 
     return HttpResponse(template.render(data, request))
+
+def AddNewRobot(request):
+    if request.method == 'POST':
+        form = NewRobot(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/app1/return_all/')
+    else:
+        form = NewRobot()
+    return render(request, 'add_new.html')
