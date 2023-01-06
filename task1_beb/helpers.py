@@ -28,6 +28,8 @@ def time_in_seconds(time_messured):
     return datetime.timedelta.total_seconds(time_messured)
 
 def update_data():
+    robot = robot_info()
+
     #Randomizing data send:
     robot_telemetry["timestamp"] = datetime.datetime.now()
     robot_telemetry["humidity"] = random.randint(0, 100)
@@ -37,17 +39,14 @@ def update_data():
     robot_location["latitude"] = random.randint(0, 90)
     robot_location["longitude"] = random.randint(0, 90)
 
-    new_robot = Robot(telemetry_timestamp = robot_telemetry["timestamp"], 
-                      telemetry_humidity = robot_telemetry["humidity"],
-                      telemetry_temperature = robot_telemetry["temperature"],
-                      telemetry_pressure = robot_telemetry["pressure"],
-                      location_timestamp = robot_location["timestamp"],
-                      location_latitude = robot_location["latitude"],
-                      location_longitude = robot_location["longitude"],
-                      )
-    # new_robot.save()
+    Robot.objects.filter(serial_number=robot["serial_number"]).update(telemetry_timestamp = robot_telemetry["timestamp"], 
+                                                                      telemetry_humidity=robot_telemetry["humidity"],
+                                                                      telemetry_temperature = robot_telemetry["temperature"],
+                                                                      telemetry_pressure = robot_telemetry["pressure"],
+                                                                      location_timestamp = robot_location["timestamp"],
+                                                                      location_latitude = robot_location["latitude"],
+                                                                      location_longitude = robot_location["longitude"],)
         
-
 def make_robot_info():
     robot = robot_info()
     return f'Robot {robot["serial_number"]} - {robot["production_date"]}. Type: {robot["type"]} - '
