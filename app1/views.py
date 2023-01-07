@@ -42,10 +42,20 @@ def ReturnTelemetry(request):
     return HttpResponse(template.render(data, request))
 
 def ReturnLocation(request):
-    pass
+    robot_data = Robot.objects.all().values()
+    template = loader.get_template('return_location.html')
+    data = {
+        'robots': robot_data,
+    }
+    return HttpResponse(template.render(data, request))
 
 def ReturnLatestLocationOfAll(request):
-    pass
+    robot_data = Robot.objects.all().values()
+    template = loader.get_template('return_latest_location.html')
+    data = {
+        'robots': robot_data,
+    }
+    return HttpResponse(template.render(data, request))
 
 def GetRobotBrand(request):
     robot_data = Robot.objects.all().values()
