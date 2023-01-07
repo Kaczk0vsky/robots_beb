@@ -8,7 +8,6 @@ from app1.forms import NewRobot
 def ReturnAllRobots(request):
     robot_data = Robot.objects.all().values()
     template = loader.get_template('return_all.html')
-
     data = {
         'robots': robot_data,
     }
@@ -18,7 +17,6 @@ def ReturnAllRobots(request):
 def ReturnRobotData(request):
     robot_data = Robot.objects.all().values()
     template = loader.get_template('return_robot_data.html')
-
     data = {
         'robots': robot_data,
     }
@@ -49,5 +47,18 @@ def ReturnLocation(request):
 def ReturnLatestLocationOfAll(request):
     pass
 
+def GetRobotBrand(request):
+    robot_data = Robot.objects.all().values()
+    template = loader.get_template('modify_robot.html')
+    data = {
+        'robots': robot_data,
+    }
+    
+    return HttpResponse(template.render(data, request))
+
 def ModifyRobotBrand(request):
-    pass
+    serial = request.POST['serial_number']
+    type = request.POST['type']
+    Robot.objects.filter(serial_number=serial).update(type = type)
+    
+    return HttpResponseRedirect('/app1/return_all/')
