@@ -1,4 +1,5 @@
 from django.http import HttpResponse, HttpResponseRedirect
+from django.db.models.functions import Extract
 from app1.models import Robot
 from django.template import loader
 from django.shortcuts import render
@@ -39,6 +40,19 @@ def ReturnTelemetry(request):
     data = {
         'robots': robot_data,
     }
+    return HttpResponse(template.render(data, request))
+
+def ReturnedTelemetry(request):
+    serial = request.POST['serial_number']
+    start_time = request.POST['start_time']
+    end_time = request.POST['end_time']
+
+    robot_data = Robot.objects.filter(serial_number=serial).values()     # =Extract('start_time', 'end_time')
+    template = loader.get_template('returned_telemetry.html')
+    data = {
+        'robots': robot_data,
+    }
+
     return HttpResponse(template.render(data, request))
 
 def ReturnLocation(request):

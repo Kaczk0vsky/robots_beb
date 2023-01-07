@@ -2,7 +2,20 @@
 <html>
 <body>
 
-<p>Returned telemetry:</p>
+<form action="/app1/return_telemetry/returned_telemetry/" method="post">
+    {% csrf_token %}
+    <table border='1'>
+        <td><p>Serial number:</p></td>
+        <td><p>Start time: (YYYY-MM-DD)</p></td>
+        <td><p>End time: (YYYY-MM-DD)</p></td>
+        <tr>
+          <td><input id="serial_number" type="text" name="serial_number" maxlength="5" value="{{ data.serial_number }}" required></td>
+          <td><input id="start_time" type="text" name="start_time" maxlength="10" value="{{ data.start_time }}" required></td>
+          <td><input id="end_time" type="text" name="end_time" maxlength="10" value="{{ data.end_time}}" required></td>
+        </tr>
+    </table>
+    <input type="submit" value="Get logs">
+</form>
 
 </body>
 </html>  
