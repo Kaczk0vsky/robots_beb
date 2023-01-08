@@ -41,9 +41,12 @@ def ReturnTelemetry(request):
         todate = request.POST.get('todate')
         serial = request.POST.get('serial_number')
         searchresult = Robot.objects.raw('SELECT * FROM app1_robot WHERE (serial_number = "'+serial+'") AND (telemetry_timestamp BETWEEN "'+fromdate+'" AND "'+todate+'")')
+        all_data = Robot.objects.raw('SELECT timestamp_all, humidity_all, temperature_all, pressure_all FROM app1_robot WHERE (serial_number = "'+serial+'") AND (telemetry_timestamp BETWEEN "'+fromdate+'" AND "'+todate+'")')
         data = {
             'robots': searchresult,
+            'all_data': all_data,
         }
+
         return HttpResponse(template.render(data, request))
     else:
         robot_data = Robot.objects.all().values()

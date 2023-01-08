@@ -18,13 +18,13 @@
         <td><p>Humidity:</p></td>
         <td><p>Temperature:</p></td>
         <td><p>Pressure:</p></td>
-        {% for x in robots %}
+        {% for x in time_data %}
           <tr>
-            <td>{{ x.serial_number}}</td>
-            <td>{{ x.telemetry_timestamp }}</td>
-            <td>{{ x.telemetry_humidity }}</td>
-            <td>{{ x.telemetry_temperature }}</td>
-            <td>{{ x.telemetry_pressure }}</td>
+            <td>{{ robots.serial_number}}</td>
+            <td>{{ x.timestamp_all }}</td>
+            <td>{{ x.humidity_all }}</td>
+            <td>{{ x.temperature_all }}</td>
+            <td>{{ x.pressure_all }}</td>
           </tr>
         {% endfor %}
       </table>

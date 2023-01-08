@@ -2,6 +2,18 @@ from django.db import models
 from django.utils import timezone
 
 
+class RobotData(models.Model):
+    robot_data = models.CharField(max_length=10)
+
+class RobotHumidity(models.Model):
+    robot_data = models.CharField(max_length=10)
+
+class RobotTemperature(models.Model):
+    robot_data = models.CharField(max_length=10)
+
+class RobotPressure(models.Model):
+    robot_data = models.CharField(max_length=10)
+
 class Robot(models.Model):
     FOUR_WHEELER = '4 wheeler'
     AMPHIBIAN = 'amphibian'
@@ -32,12 +44,11 @@ class Robot(models.Model):
     location_longitude = models.CharField(max_length=5, default=0, editable=False)
 
     #Many to many fields for saving multiple records
-    timestamp_all = models.ManyToManyField('RobotData')
+    timestamp_all = models.ManyToManyField(RobotData)
+    humidity_all = models.ManyToManyField(RobotHumidity)
+    temperature_all = models.ManyToManyField(RobotTemperature)
+    pressure_all = models.ManyToManyField(RobotPressure)
 
     def __str__(self):
         return self.serial_number
-
-
-class RobotData(models.Model):
-    robot_data = models.CharField(max_length=10)
 

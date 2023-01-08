@@ -6,7 +6,7 @@ django.setup()
 
 from task1_beb.settings_reader import robot_info
 from django.conf import settings
-from app1.models import Robot, RobotData
+from app1.models import Robot, RobotData, RobotHumidity, RobotPressure, RobotTemperature
 import datetime
 import random
 
@@ -46,6 +46,14 @@ def update_data():
                                                                       location_timestamp = robot_location["timestamp"],
                                                                       location_latitude = robot_location["latitude"],
                                                                       location_longitude = robot_location["longitude"],)
+
+    #Fix sending to all robots
+    prev = Robot.objects.get(serial_number=robot["serial_number"])
+    prev.timestamp_all.add(RobotData.objects.create(robot_data=robot_telemetry["timestamp"]))
+    prev.humidity_all.add(RobotHumidity.objects.create(robot_data=robot_telemetry["humidity"]))
+    prev.temperature_all.add(RobotTemperature.objects.create(robot_data=robot_telemetry["temperature"]))
+    prev.pressure_all.add(RobotPressure.objects.create(robot_data=robot_telemetry["pressure"]))
+    
         
 def make_robot_info():
     robot = robot_info()
@@ -58,3 +66,5 @@ def add_robot():
     else:
         new_robot = Robot(serial_number = robot["serial_number"], production_date = robot["production_date"], type = robot["type"], company = robot["company"])
         new_robot.save()
+        RobotData.objects.create(robot_data=robot_telemetry["timestamp"])
+    
