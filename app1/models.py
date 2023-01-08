@@ -30,6 +30,7 @@ class Robot(models.Model):
     location_timestamp = models.DateTimeField(default=timezone.now, editable=False)
     location_latitude = models.CharField(max_length=5, default=0, editable=False)
     location_longitude = models.CharField(max_length=5, default=0, editable=False)
+    start_time = models.DateTimeField(default=timezone.now, editable=False)
 
     def __str__(self):
         return self.serial_number

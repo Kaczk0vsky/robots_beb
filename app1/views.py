@@ -47,10 +47,13 @@ def ReturnedTelemetry(request):
     start_time = request.POST['start_time']
     end_time = request.POST['end_time']
 
-    robot_data = Robot.objects.filter(serial_number=serial).values()     # =Extract('start_time', 'end_time')
+    table_size = Robot.objects.filter(serial_number=serial).count()
+    robot_data = Robot.objects.filter(serial_number=serial, start_time=start_time).values()     # =Extract('start_time', 'end_time')
+
     template = loader.get_template('returned_telemetry.html')
     data = {
         'robots': robot_data,
+        'table_size': table_size,
     }
 
     return HttpResponse(template.render(data, request))
