@@ -6,7 +6,7 @@ django.setup()
 
 from task1_beb.settings_reader import robot_info
 from django.conf import settings
-from app1.models import Robot
+from app1.models import Robot, RobotData
 import datetime
 import random
 

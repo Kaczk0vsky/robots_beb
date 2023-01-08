@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ReturnAllRobots, ReturnRobotData, AddNewRobot, ReturnTelemetry, ReturnedTelemetry, ReturnLocation, ReturnLatestLocationOfAll, ModifyRobotBrand, GetRobotBrand
+from .views import ReturnAllRobots, ReturnRobotData, AddNewRobot, ReturnTelemetry, ReturnLocation, ReturnLatestLocationOfAll, ModifyRobotBrand, GetRobotBrand
 
 
 urlpatterns = [
@@ -7,7 +7,6 @@ urlpatterns = [
     path('return_robot_data/', ReturnRobotData, name='ReturnRobotData'),
     path('add_new/', AddNewRobot, name='AddNewRobot'),
     path('return_telemetry/', ReturnTelemetry, name='ReturnTelemetry'),
-    path('return_telemetry/returned_telemetry/', ReturnedTelemetry, name='ReturnedTelemetry'),
     path('return_location/', ReturnLocation, name='ReturnLocation'),
     path('return_latest_location/', ReturnLatestLocationOfAll, name='ReturnLatestLocationOfAll'),
     path('modify_robot/', GetRobotBrand, name='GetRobotBrand'),

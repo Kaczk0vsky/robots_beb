@@ -35,28 +35,22 @@ def AddNewRobot(request):
     return render(request, 'add_new.html')
 
 def ReturnTelemetry(request):
-    robot_data = Robot.objects.all().values()
     template = loader.get_template('return_telemetry.html')
-    data = {
-        'robots': robot_data,
-    }
-    return HttpResponse(template.render(data, request))
-
-def ReturnedTelemetry(request):
-    serial = request.POST['serial_number']
-    start_time = request.POST['start_time']
-    end_time = request.POST['end_time']
-
-    table_size = Robot.objects.filter(serial_number=serial).count()
-    robot_data = Robot.objects.filter(serial_number=serial, start_time=start_time).values()     # =Extract('start_time', 'end_time')
-
-    template = loader.get_template('returned_telemetry.html')
-    data = {
-        'robots': robot_data,
-        'table_size': table_size,
-    }
-
-    return HttpResponse(template.render(data, request))
+    if request.method == 'POST':
+        fromdate = request.POST.get('fromdate')
+        todate = request.POST.get('todate')
+        serial = request.POST.get('serial_number')
+        searchresult = Robot.objects.raw('SELECT * FROM app1_robot WHERE (serial_number = "'+serial+'") AND (telemetry_timestamp BETWEEN "'+fromdate+'" AND "'+todate+'")')
+        data = {
+            'robots': searchresult,
+        }
+        return HttpResponse(template.render(data, request))
+    else:
+        robot_data = Robot.objects.all().values()
+        data = {
+            'robots': robot_data,
+        }
+        return HttpResponse(template.render(data, request))
 
 def ReturnLocation(request):
     robot_data = Robot.objects.all().values()
