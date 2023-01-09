@@ -4,6 +4,7 @@ from app1.models import Robot
 from django.template import loader
 from django.shortcuts import render
 from app1.forms import NewRobot
+from django.db import connection
 
 
 def ReturnAllRobots(request):
@@ -40,10 +41,12 @@ def ReturnTelemetry(request):
         fromdate = request.POST.get('fromdate')
         todate = request.POST.get('todate')
         serial = request.POST.get('serial_number')
-        searchresult = Robot.objects.raw('SELECT * FROM app1_robot WHERE (serial_number = "'+serial+'") AND (telemetry_timestamp BETWEEN "'+fromdate+'" AND "'+todate+'")')
-        all_data = Robot.objects.raw('SELECT timestamp_all, humidity_all, temperature_all, pressure_all FROM app1_robot WHERE (serial_number = "'+serial+'") AND (telemetry_timestamp BETWEEN "'+fromdate+'" AND "'+todate+'")')
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT * FROM app1_robot WHERE (serial_number = "'+serial+'") AND (telemetry_timestamp BETWEEN "'+fromdate+'" AND "'+todate+'")')
+            all_data = cursor.fetchone()
+        print(all_data)
+        # all_data = Robot.objects.raw('SELECT timestamp_all, humidity_all, temperature_all, pressure_all WHERE (serial_number = "'+serial+'") AND (telemetry_timestamp BETWEEN "'+fromdate+'" AND "'+todate+'") FROM app1_robot')
         data = {
-            'robots': searchresult,
             'all_data': all_data,
         }
 

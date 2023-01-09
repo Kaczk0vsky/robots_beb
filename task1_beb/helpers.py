@@ -53,7 +53,6 @@ def update_data():
     prev.humidity_all.add(RobotHumidity.objects.create(robot_data=robot_telemetry["humidity"]))
     prev.temperature_all.add(RobotTemperature.objects.create(robot_data=robot_telemetry["temperature"]))
     prev.pressure_all.add(RobotPressure.objects.create(robot_data=robot_telemetry["pressure"]))
-    
         
 def make_robot_info():
     robot = robot_info()
