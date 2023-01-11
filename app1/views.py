@@ -1,5 +1,4 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.db.models.functions import Extract
 from app1.models import Robot
 from django.template import loader
 from django.shortcuts import render
@@ -41,14 +40,6 @@ def ReturnTelemetry(request):
         fromdate = request.POST.get('fromdate')
         todate = request.POST.get('todate')
         serial = request.POST.get('serial_number')
-        with connection.cursor() as cursor:
-            cursor.execute('SELECT * FROM app1_robot WHERE (serial_number = "'+serial+'") AND (telemetry_timestamp BETWEEN "'+fromdate+'" AND "'+todate+'")')
-            all_data = cursor.fetchone()
-        print(all_data)
-        # all_data = Robot.objects.raw('SELECT timestamp_all, humidity_all, temperature_all, pressure_all WHERE (serial_number = "'+serial+'") AND (telemetry_timestamp BETWEEN "'+fromdate+'" AND "'+todate+'") FROM app1_robot')
-        data = {
-            'all_data': all_data,
-        }
 
         return HttpResponse(template.render(data, request))
     else:
@@ -86,6 +77,6 @@ def GetRobotBrand(request):
 def ModifyRobotBrand(request):
     serial = request.POST['serial_number']
     type = request.POST['type']
-    Robot.objects.filter(serial_number=serial).update(type = type)
+    Robot.objects.filter(pk=serial).update(type = type)
     
     return HttpResponseRedirect('/app1/return_all/')

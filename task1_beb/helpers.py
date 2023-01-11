@@ -6,64 +6,62 @@ django.setup()
 
 from task1_beb.settings_reader import robot_info
 from django.conf import settings
-from app1.models import Robot, RobotData, RobotHumidity, RobotPressure, RobotTemperature
+from app1.models import Robot
+from django.utils import timezone
 import datetime
 import random
 
+#dicts containing robot data
 robot_telemetry = {
-    'timestamp': datetime.datetime.now(),
     'humidity': 0,
     'temperature': 0,
     'pressure': 0,
 }
 
 robot_location = {
-    'timestamp': datetime.datetime.now(),
     'latitude': 0.0,
     'longitude': 0.0,
 }
 
+robot_timestamp = {
+    'timestamp': timezone.now(),
+}
 
 def time_in_seconds(time_messured):
     return datetime.timedelta.total_seconds(time_messured)
 
 def update_data():
+    #getting info from settings.toml as a dict
     robot = robot_info()
 
-    #Randomizing data send:
-    robot_telemetry["timestamp"] = datetime.datetime.now()
+    #randomizing data send:
+    robot_timestamp["timestamp"] = timezone.now()
     robot_telemetry["humidity"] = random.randint(0, 100)
     robot_telemetry["temperature"] = random.randint(-10, 40)
     robot_telemetry["pressure"] = random.randint(970, 1030)
-    robot_location["timestamp"] = datetime.datetime.now()
     robot_location["latitude"] = random.randint(0, 90)
     robot_location["longitude"] = random.randint(0, 90)
 
-    Robot.objects.filter(serial_number=robot["serial_number"]).update(telemetry_timestamp = robot_telemetry["timestamp"], 
-                                                                      telemetry_humidity=robot_telemetry["humidity"],
-                                                                      telemetry_temperature = robot_telemetry["temperature"],
-                                                                      telemetry_pressure = robot_telemetry["pressure"],
-                                                                      location_timestamp = robot_location["timestamp"],
-                                                                      location_latitude = robot_location["latitude"],
-                                                                      location_longitude = robot_location["longitude"],)
+    #saving latest robot data
+    Robot.objects.filter(pk=robot["serial_number"]).update(timestamp = robot_timestamp["timestamp"], 
+                                                            telemetry_humidity = robot_telemetry["humidity"],
+                                                            telemetry_temperature = robot_telemetry["temperature"],
+                                                            telemetry_pressure = robot_telemetry["pressure"],
+                                                            location_latitude = robot_location["latitude"],
+                                                            location_longitude = robot_location["longitude"],)
 
-    #Fix sending to all robots
-    prev = Robot.objects.get(serial_number=robot["serial_number"])
-    prev.timestamp_all.add(RobotData.objects.create(robot_data=robot_telemetry["timestamp"]))
-    prev.humidity_all.add(RobotHumidity.objects.create(robot_data=robot_telemetry["humidity"]))
-    prev.temperature_all.add(RobotTemperature.objects.create(robot_data=robot_telemetry["temperature"]))
-    prev.pressure_all.add(RobotPressure.objects.create(robot_data=robot_telemetry["pressure"]))
-        
+    #save robot data
+    prev = Robot.objects.get(pk=robot["serial_number"])
+    prev.telemetry_humidity
+
 def make_robot_info():
     robot = robot_info()
     return f'Robot {robot["serial_number"]} - {robot["production_date"]}. Type: {robot["type"]} - '
 
 def add_robot():
     robot = robot_info()
-    if Robot.objects.filter(serial_number = robot["serial_number"]).exists():
+    if Robot.objects.filter(pk=robot["serial_number"]).exists():
         pass
     else:
-        new_robot = Robot(serial_number = robot["serial_number"], production_date = robot["production_date"], type = robot["type"], company = robot["company"])
-        new_robot.save()
-        RobotData.objects.create(robot_data=robot_telemetry["timestamp"])
+        Robot(serial_number = robot["serial_number"], production_date = robot["production_date"], type = robot["type"], company = robot["company"]).save()
     

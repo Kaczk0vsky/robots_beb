@@ -1,7 +1,7 @@
 from paho.mqtt import client as mqtt
 from task1_beb.settings_reader import mqtt_settings
 from datetime import datetime
-from task1_beb.helpers import time_in_seconds, robot_location, robot_telemetry, update_data, make_robot_info
+from task1_beb.helpers import time_in_seconds, robot_location, robot_telemetry, robot_timestamp, update_data, make_robot_info
 import logging
 
 logger = logging.getLogger(__name__)
@@ -53,11 +53,11 @@ def on_disconnect(client, userdata, flags, rc):
 
 def send_data():
     logger.info(name + f'Sent robot parameters on topic {mqqt_config["topic"]}.')
-    client.publish(f'{mqqt_config["topic"]}/robot_telemetry/timestamp', str(robot_telemetry["timestamp"]))
+    client.publish(f'{mqqt_config["topic"]}/robot_telemetry/timestamp', str(robot_timestamp["timestamp"]))
     client.publish(f'{mqqt_config["topic"]}/robot_telemetry/humidity', robot_telemetry["humidity"])
     client.publish(f'{mqqt_config["topic"]}/robot_telemetry/temperature', robot_telemetry["temperature"])
     client.publish(f'{mqqt_config["topic"]}/robot_telemetry/pressure', robot_telemetry["pressure"])
-    client.publish(f'{mqqt_config["topic"]}/robot_location/timestamp', str(robot_location["timestamp"]))
+    client.publish(f'{mqqt_config["topic"]}/robot_location/timestamp', str(robot_timestamp["timestamp"]))
     client.publish(f'{mqqt_config["topic"]}/robot_location/latitude', robot_location["latitude"])
     client.publish(f'{mqqt_config["topic"]}/robot_location/longitude', robot_location["longitude"])
 

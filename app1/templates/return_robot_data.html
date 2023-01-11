@@ -5,20 +5,18 @@
 <p>Returned all robots data:</p>
 
 <table border='1'>
-    <td><p>Telemetry timestamp:</p></td>
+    <td><p>Timestamp:</p></td>
     <td><p>Humidity:</p></td>
     <td><p>Temperature:</p></td>
     <td><p>Pressure:</p></td>
-    <td><p>Location timestamp:</p></td>
     <td><p>Latitude:</p></td>
     <td><p>Longitude:</p></td>
   {% for x in robots %}
     <tr>
-      <td>{{ x.telemetry_timestamp }}</td>
+      <td>{{ x.timestamp }}</td>
       <td>{{ x.telemetry_humidity }}</td>
       <td>{{ x.telemetry_temperature }}</td>
       <td>{{ x.telemetry_pressure }}</td>
-      <td>{{ x.location_timestamp }}</td>
       <td>{{ x.location_latitude }}</td>
       <td>{{ x.location_longitude }}</td>
     </tr>
