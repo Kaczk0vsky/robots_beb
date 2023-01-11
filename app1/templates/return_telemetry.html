@@ -13,18 +13,16 @@
       <input type="submit" value="Search"/>
       <hr/>
       <table border='1'>
-        <!-- <td><p>Serial number:</p></td> -->
         <td><p>Timestamp:</p></td>
-        <!-- <td><p>Humidity:</p></td>
+        <td><p>Humidity:</p></td>
         <td><p>Temperature:</p></td>
-        <td><p>Pressure:</p></td> -->
-        {% for x in timestamp_data %}
+        <td><p>Pressure:</p></td>
+        {% for x in robots %}
           <tr>
-            <!-- <td>{{ robots.serial_number}}</td> -->
-            <td>{{ x }}</td>
-            <!-- <td>{{ x.humidity_all }}</td>
-            <td>{{ x.temperature_all }}</td>
-            <td>{{ x.pressure_all }}</td> -->
+            <td>{{ x.timestamp }}</td>
+            <td>{{ x.telemetry_humidity }}</td>
+            <td>{{ x.telemetry_temperature }}</td>
+            <td>{{ x.telemetry_pressure }}</td>
           </tr>
         {% endfor %}
       </table>

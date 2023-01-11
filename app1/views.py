@@ -1,5 +1,5 @@
-from django.http import HttpResponse, HttpResponseRedirect
-from app1.models import Robot
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from app1.models import Robot, RobotLog
 from django.template import loader
 from django.shortcuts import render
 from app1.forms import NewRobot
@@ -7,7 +7,7 @@ from django.db import connection
 
 
 def ReturnAllRobots(request):
-    robot_data = Robot.objects.all().values()
+    robot_data = Robot.objects.raw('SELECT id, type, company FROM app1_robot')
     template = loader.get_template('return_all.html')
     data = {
         'robots': robot_data,
@@ -16,13 +16,13 @@ def ReturnAllRobots(request):
     return HttpResponse(template.render(data, request))
     
 def ReturnRobotData(request):
-    robot_data = Robot.objects.all().values()
+    robot_data = Robot.objects.all().raw('SELECT * FROM app1_robotlog')
     template = loader.get_template('return_robot_data.html')
     data = {
         'robots': robot_data,
     }
 
-    return HttpResponse(template.render(data, request))
+    return JsonResponse({'robot_data': list(robot_data)})
 
 def AddNewRobot(request):
     if request.method == 'POST':
@@ -40,7 +40,13 @@ def ReturnTelemetry(request):
         fromdate = request.POST.get('fromdate')
         todate = request.POST.get('todate')
         serial = request.POST.get('serial_number')
-
+        # logs = Robot.objects.filter(pk=serial).values('robot_logs')
+        # print(logs)
+        logs = RobotLog.objects.raw('SELECT * FROM app1_robotlog WHERE timestamp BETWEEN "'+fromdate+'" AND "'+todate+'"')
+        print(logs)
+        data = {
+            'robots': logs,
+        }
         return HttpResponse(template.render(data, request))
     else:
         robot_data = Robot.objects.all().values()

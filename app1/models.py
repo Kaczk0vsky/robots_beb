@@ -2,6 +2,24 @@ from django.db import models
 from django.utils import timezone
 
 
+class RobotLog(models.Model):
+    #robot telemetry timestamp param
+    timestamp = models.DateTimeField(default=timezone.now, editable=False)
+    #robot humidity param
+    telemetry_humidity = models.IntegerField(default=0, editable=False)
+    #robot temperature param
+    telemetry_temperature = models.IntegerField(default=0, editable=False)
+    #robot pressure param
+    telemetry_pressure = models.IntegerField(default=0, editable=False)
+    #robot location latitude param
+    location_latitude = models.IntegerField(default=0, editable=False)
+    #robot location logitude param
+    location_longitude = models.IntegerField(default=0, editable=False)
+
+    def __str__(self):
+        return f"{self.timestamp}"
+
+
 class Robot(models.Model):
     #creating choices for field 
     FOUR_WHEELER = '4 wheeler'
@@ -27,19 +45,9 @@ class Robot(models.Model):
     #robot company which own it
     company = models.CharField(max_length=256)
 
-    #hidden params - non-visible and non-editable
-    #robot telemetry timestamp param
-    timestamp = models.DateTimeField(default=timezone.now)
-    #robot humidity param
-    telemetry_humidity = models.CharField(max_length=256)
-    #robot temperature param
-    telemetry_temperature = models.CharField(max_length=256)
-    #robot pressure param
-    telemetry_pressure = models.CharField(max_length=256)
-    #robot location latitude param
-    location_latitude = models.CharField(max_length=256)
-    #robot location logitude param
-    location_longitude = models.CharField(max_length=256)
+    #field containing all robot log data
+    robot_logs = models.ForeignKey(RobotLog, editable=False, on_delete=models.CASCADE, db_column='robot_logs')
 
     def __str__(self):
         return self.serial_number
+        

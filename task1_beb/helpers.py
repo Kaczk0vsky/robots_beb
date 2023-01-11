@@ -6,8 +6,9 @@ django.setup()
 
 from task1_beb.settings_reader import robot_info
 from django.conf import settings
-from app1.models import Robot
+from app1.models import Robot, RobotLog
 from django.utils import timezone
+from django.db.models import F
 import datetime
 import random
 
@@ -43,16 +44,21 @@ def update_data():
     robot_location["longitude"] = random.randint(0, 90)
 
     #saving latest robot data
-    Robot.objects.filter(pk=robot["serial_number"]).update(timestamp = robot_timestamp["timestamp"], 
-                                                            telemetry_humidity = robot_telemetry["humidity"],
-                                                            telemetry_temperature = robot_telemetry["temperature"],
-                                                            telemetry_pressure = robot_telemetry["pressure"],
-                                                            location_latitude = robot_location["latitude"],
-                                                            location_longitude = robot_location["longitude"],)
+    Robot.objects.get(pk=robot["serial_number"]).update(robot_logs=RobotLog.objects.create(timestamp = robot_timestamp["timestamp"], 
+                                                                                            telemetry_humidity = robot_telemetry["humidity"],
+                                                                                            telemetry_temperature = robot_telemetry["temperature"],
+                                                                                            telemetry_pressure = robot_telemetry["pressure"],
+                                                                                            location_latitude = robot_location["latitude"],
+                                                                                            location_longitude = robot_location["longitude"],).save())
+    # RobotLog.objects.create(timestamp = robot_timestamp["timestamp"], 
+    #                                     telemetry_humidity = robot_telemetry["humidity"],
+    #                                     telemetry_temperature = robot_telemetry["temperature"],
+    #                                     telemetry_pressure = robot_telemetry["pressure"],
+    #                                     location_latitude = robot_location["latitude"],
+    #                                     location_longitude = robot_location["longitude"],).save()
 
-    #save robot data
-    prev = Robot.objects.get(pk=robot["serial_number"])
-    prev.telemetry_humidity
+    # Robot.objects.update(robot_logs=robot_logs)
+    # Robot.objects.filter(pk=robot["serial_number"]).update_or_create()
 
 def make_robot_info():
     robot = robot_info()
@@ -63,5 +69,5 @@ def add_robot():
     if Robot.objects.filter(pk=robot["serial_number"]).exists():
         pass
     else:
-        Robot(serial_number = robot["serial_number"], production_date = robot["production_date"], type = robot["type"], company = robot["company"]).save()
+        Robot(serial_number = robot["serial_number"], production_date = robot["production_date"], type = robot["type"], company = robot["company"], robot_logs = RobotLog.objects.create()).save()
     
