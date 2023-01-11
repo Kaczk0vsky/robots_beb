@@ -41,7 +41,6 @@ def ReturnTelemetry(request):
         todate = request.POST.get('todate')
         serial = request.POST.get('serial_number')
         logs = RobotLog.objects.raw('SELECT * FROM app1_robotlog WHERE (timestamp BETWEEN "'+fromdate+'" AND "'+todate+'") AND (robot_id = "'+str(serial)+'")')
-
         data = {
             'robots': logs,
         }
@@ -54,12 +53,22 @@ def ReturnTelemetry(request):
         return HttpResponse(template.render(data, request))
 
 def ReturnLocation(request):
-    robot_data = Robot.objects.all().values()
     template = loader.get_template('return_location.html')
-    data = {
-        'robots': robot_data,
-    }
-    return HttpResponse(template.render(data, request))
+    if request.method == 'POST':
+        fromdate = request.POST.get('fromdate')
+        todate = request.POST.get('todate')
+        serial = request.POST.get('serial_number')
+        logs = RobotLog.objects.raw('SELECT * FROM app1_robotlog WHERE (timestamp BETWEEN "'+fromdate+'" AND "'+todate+'") AND (robot_id = "'+str(serial)+'")')
+        data = {
+            'robots': logs,
+        }
+        return HttpResponse(template.render(data, request))
+    else:
+        robot_data = Robot.objects.all().values()
+        data = {
+            'robots': robot_data,
+        }
+        return HttpResponse(template.render(data, request))
 
 def ReturnLatestLocationOfAll(request):
     robot_data = Robot.objects.all().values()
