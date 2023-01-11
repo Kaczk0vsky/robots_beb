@@ -3,6 +3,8 @@ from django.utils import timezone
 
 
 class RobotLog(models.Model):
+    #robot id
+    robot_id = models.CharField(max_length=256 ,editable=False)
     #robot telemetry timestamp param
     timestamp = models.DateTimeField(default=timezone.now, editable=False)
     #robot humidity param
@@ -17,7 +19,7 @@ class RobotLog(models.Model):
     location_longitude = models.IntegerField(default=0, editable=False)
 
     def __str__(self):
-        return f"{self.timestamp}"
+        return f"Robot: {self.robot_id} - {self.timestamp}"
 
 
 class Robot(models.Model):
@@ -46,7 +48,7 @@ class Robot(models.Model):
     company = models.CharField(max_length=256)
 
     #field containing all robot log data
-    robot_logs = models.ForeignKey(RobotLog, editable=False, on_delete=models.CASCADE, db_column='robot_logs')
+    robot_logs = models.ForeignKey(RobotLog, editable=False, on_delete=models.CASCADE, db_column='robot_logs', blank=True)
 
     def __str__(self):
         return self.serial_number

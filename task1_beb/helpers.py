@@ -44,18 +44,14 @@ def update_data():
     robot_location["longitude"] = random.randint(0, 90)
 
     #saving latest robot data
-    Robot.objects.get(pk=robot["serial_number"]).update(robot_logs=RobotLog.objects.create(timestamp = robot_timestamp["timestamp"], 
-                                                                                            telemetry_humidity = robot_telemetry["humidity"],
-                                                                                            telemetry_temperature = robot_telemetry["temperature"],
-                                                                                            telemetry_pressure = robot_telemetry["pressure"],
-                                                                                            location_latitude = robot_location["latitude"],
-                                                                                            location_longitude = robot_location["longitude"],).save())
-    # RobotLog.objects.create(timestamp = robot_timestamp["timestamp"], 
-    #                                     telemetry_humidity = robot_telemetry["humidity"],
-    #                                     telemetry_temperature = robot_telemetry["temperature"],
-    #                                     telemetry_pressure = robot_telemetry["pressure"],
-    #                                     location_latitude = robot_location["latitude"],
-    #                                     location_longitude = robot_location["longitude"],).save()
+    RobotLog.objects.filter(robot_id = robot["serial_number"]).update_or_create(
+                                                                    robot_id = robot["serial_number"],
+                                                                    timestamp = robot_timestamp["timestamp"], 
+                                                                    telemetry_humidity = robot_telemetry["humidity"],
+                                                                    telemetry_temperature = robot_telemetry["temperature"],
+                                                                    telemetry_pressure = robot_telemetry["pressure"],
+                                                                    location_latitude = robot_location["latitude"],
+                                                                    location_longitude = robot_location["longitude"],)
 
     # Robot.objects.update(robot_logs=robot_logs)
     # Robot.objects.filter(pk=robot["serial_number"]).update_or_create()

@@ -40,10 +40,8 @@ def ReturnTelemetry(request):
         fromdate = request.POST.get('fromdate')
         todate = request.POST.get('todate')
         serial = request.POST.get('serial_number')
-        # logs = Robot.objects.filter(pk=serial).values('robot_logs')
-        # print(logs)
-        logs = RobotLog.objects.raw('SELECT * FROM app1_robotlog WHERE timestamp BETWEEN "'+fromdate+'" AND "'+todate+'"')
-        print(logs)
+        logs = RobotLog.objects.raw('SELECT * FROM app1_robotlog WHERE (timestamp BETWEEN "'+fromdate+'" AND "'+todate+'") AND (robot_id = "'+str(serial)+'")')
+
         data = {
             'robots': logs,
         }
