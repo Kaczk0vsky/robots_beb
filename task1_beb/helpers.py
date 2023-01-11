@@ -53,9 +53,6 @@ def update_data():
                                                                     location_latitude = robot_location["latitude"],
                                                                     location_longitude = robot_location["longitude"],)
 
-    # Robot.objects.update(robot_logs=robot_logs)
-    # Robot.objects.filter(pk=robot["serial_number"]).update_or_create()
-
 def make_robot_info():
     robot = robot_info()
     return f'Robot {robot["serial_number"]} - {robot["production_date"]}. Type: {robot["type"]} - '
