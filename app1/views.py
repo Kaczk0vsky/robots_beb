@@ -16,9 +16,14 @@ def ReturnAllRobots(request):
     return HttpResponse(template.render(data, request))
     
 def ReturnRobotData(request):
-    robot_data = Robot.objects.all().raw('SELECT * FROM app1_robotlog')
-
-    return JsonResponse({'robot_data': list(robot_data)})
+    robot_data = Robot.objects.all().count()
+    index = 1
+    data = {}
+    while index <= robot_data:
+        data[index] = f"{Robot.objects.filter(pk=index).values().get()}, {RobotLog.objects.filter(robot_id=index).values().last()}"
+        index+=1
+    print(data)
+    return JsonResponse({'robot_data': data})
 
 def AddNewRobot(request):
     if request.method == 'POST':
@@ -67,12 +72,14 @@ def ReturnLocation(request):
         return HttpResponse(template.render(data, request))
 
 def ReturnLatestLocationOfAll(request):
-    robot_data = Robot.objects.all().values()
-    template = loader.get_template('return_latest_location.html')
-    data = {
-        'robots': robot_data,
-    }
-    return HttpResponse(template.render(data, request))
+    robot_data = Robot.objects.all().count()
+    index = 1
+    data = {}
+    while index <= robot_data:
+        data[index] = f"{RobotLog.objects.filter(robot_id=index).values_list('timestamp', 'location_latitude', 'location_longitude').last()}"
+        index+=1
+    print(data)
+    return JsonResponse({'robot_data': data})
 
 def GetRobotBrand(request):
     robot_data = Robot.objects.all().values()
