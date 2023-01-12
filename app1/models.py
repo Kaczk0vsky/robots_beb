@@ -47,9 +47,6 @@ class Robot(models.Model):
     #robot company which own it
     company = models.CharField(max_length=256)
 
-    #field containing all robot log data
-    robot_logs = models.ForeignKey(RobotLog, editable=False, on_delete=models.CASCADE, db_column='robot_logs', blank=True)
-
     def __str__(self):
         return self.serial_number
         

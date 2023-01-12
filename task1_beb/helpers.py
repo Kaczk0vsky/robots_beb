@@ -67,12 +67,5 @@ def add_robot():
             production_date = robot["production_date"],
             type = robot["type"], 
             company = robot["company"], 
-            robot_logs = RobotLog.objects.create(robot_id = robot["serial_number"],
-                                                timestamp = robot_timestamp["timestamp"], 
-                                                telemetry_humidity = robot_telemetry["humidity"],
-                                                telemetry_temperature = robot_telemetry["temperature"],
-                                                telemetry_pressure = robot_telemetry["pressure"],
-                                                location_latitude = robot_location["latitude"],
-                                                location_longitude = robot_location["longitude"],)
             ).save()
     

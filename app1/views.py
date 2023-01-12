@@ -13,7 +13,6 @@ def ReturnAllRobots(request):
     while index <= robot_data:
         data[index] = Robot.objects.filter(pk=index).values_list('serial_number', 'type', 'company').get()
         index+=1
-    print(data)
     return JsonResponse({'robot_data': data})
     
 def ReturnRobotData(request):
@@ -21,9 +20,8 @@ def ReturnRobotData(request):
     index = 1
     data = {}
     while index <= robot_data:
-        data[index] = f"{Robot.objects.filter(pk=index).values().get()}, {RobotLog.objects.filter(robot_id=index).values().last()}"
+        data[index] = f"{Robot.objects.filter(pk=index).values_list('serial_number', 'production_date', 'type', 'company').get()}, {RobotLog.objects.filter(robot_id=index).values_list('robot_id', 'timestamp', 'telemetry_humidity', 'telemetry_temperature', 'telemetry_pressure', 'location_latitude', 'location_longitude').last()}"
         index+=1
-    print(data)
     return JsonResponse({'robot_data': data})
 
 def AddNewRobot(request):
