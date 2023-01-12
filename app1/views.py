@@ -7,13 +7,14 @@ from django.db import connection
 
 
 def ReturnAllRobots(request):
-    robot_data = Robot.objects.raw('SELECT id, type, company FROM app1_robot')
-    template = loader.get_template('return_all.html')
-    data = {
-        'robots': robot_data,
-    }
-    
-    return HttpResponse(template.render(data, request))
+    robot_data = Robot.objects.all().count()
+    index = 1
+    data = {}
+    while index <= robot_data:
+        data[index] = Robot.objects.filter(pk=index).values_list('serial_number', 'type', 'company').get()
+        index+=1
+    print(data)
+    return JsonResponse({'robot_data': data})
     
 def ReturnRobotData(request):
     robot_data = Robot.objects.all().count()
