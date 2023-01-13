@@ -13,7 +13,7 @@ def return_all_robots(request):
     while index <= robot_data:
         data[index] = Robot.objects.filter(pk=index).values_list('serial_number', 'type', 'company').get()
         index+=1
-    return JsonResponse({'robot_data': data})
+    return JsonResponse(data)
     
 def return_robot_data(request):
     robot_data = Robot.objects.all().count()
@@ -22,7 +22,7 @@ def return_robot_data(request):
     while index <= robot_data:
         data[index] = f"{Robot.objects.filter(pk=index).values_list('serial_number', 'production_date', 'type', 'company').get()}, {RobotLog.objects.filter(robot_id=index).values_list('robot_id', 'timestamp', 'telemetry_humidity', 'telemetry_temperature', 'telemetry_pressure', 'location_latitude', 'location_longitude').last()}"
         index+=1
-    return JsonResponse({'robot_data': data})
+    return JsonResponse(data)
 
 def add_new_robot(request):
     if request.method == 'POST':
@@ -43,7 +43,7 @@ def return_telemetry(request):
         with connection.cursor() as cursor:
             cursor.execute('SELECT * FROM app1_robotlog WHERE (timestamp BETWEEN "'+fromdate+'" AND "'+todate+'") AND (robot_id = "'+str(serial)+'")')
             logs = cursor.fetchall()
-        return JsonResponse({'robot_data': logs})
+        return JsonResponse(logs, safe=False)
     else:
         return HttpResponse(template.render({}, request))
 
@@ -56,7 +56,7 @@ def return_location(request):
         with connection.cursor() as cursor:
             cursor.execute('SELECT * FROM app1_robotlog WHERE (timestamp BETWEEN "'+fromdate+'" AND "'+todate+'") AND (robot_id = "'+str(serial)+'")')
             logs = cursor.fetchall()
-        return JsonResponse({'robot_data': logs})
+        return JsonResponse(logs, safe=False)
     else:
         return HttpResponse(template.render({}, request))
 
@@ -67,7 +67,7 @@ def return_latest_location(request):
     while index <= robot_data:
         data[index] = f"{RobotLog.objects.filter(robot_id=index).values_list('timestamp', 'location_latitude', 'location_longitude').last()}"
         index+=1
-    return JsonResponse({'robot_data': data})
+    return JsonResponse(data)
 
 def update_robot(request):
     if request.method=='POST':
