@@ -1,14 +1,13 @@
 import os
 import django
 #Crimes against humanity
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task1_beb.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "app1.settings")
 django.setup()
 
-from settings_reader import robot_info
+from task1_beb.settings_reader import robot_info
 from django.conf import settings
 from app1.models import Robot, RobotLog
 from django.utils import timezone
-from django.db.models import F
 import datetime
 import random
 

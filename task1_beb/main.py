@@ -1,7 +1,10 @@
-from mqtt_communication import TimeMessure, mqtt_init, mqtt_loop_forever
-from task1_beb.helper import add_robot
+import sys
 import logging
 import threading
+sys.path.append("..")
+
+from task1_beb.mqtt_communication import TimeMessure, mqtt_init, mqtt_loop_forever
+from task1_beb.helper import add_robot
 
 
 def initialization():

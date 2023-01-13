@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-%xfdc303#ae+yzxlabryqyo%5av7*y*b=jr(%28$4m6&p=a%lq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost"]
 
 
 # Application definition
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'task1_beb',
 ]
 
 MIDDLEWARE = [
@@ -51,7 +52,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'task1_beb.urls'
+ROOT_URLCONF = 'app1.urls'
 
 TEMPLATES = [
     {
@@ -69,7 +70,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'task1_beb.wsgi.application'
+WSGI_APPLICATION = 'app1.wsgi.application'
 
 
 # Database

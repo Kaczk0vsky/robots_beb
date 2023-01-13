@@ -22,7 +22,7 @@ services:
       - db
   user_program:
     build: .
-    command: python task1_beb/main.py
+    command: sh -c "cd /code/task1_beb && python3 main.py"
     volumes:
       - .:/code
     depends_on:
