@@ -41,7 +41,7 @@ def return_telemetry(request):
         todate = request.POST.get('todate')
         serial = request.POST.get('serial_number')
         with connection.cursor() as cursor:
-            cursor.execute('SELECT * FROM app1_robotlog WHERE (timestamp BETWEEN "'+fromdate+'" AND "'+todate+'") AND (robot_id = "'+str(serial)+'")')
+            cursor.execute('SELECT robot_id, timestamp, telemetry_humidity, telemetry_temperature, telemetry_pressure FROM app1_robotlog WHERE (timestamp BETWEEN "'+fromdate+'" AND "'+todate+'") AND (robot_id = "'+str(serial)+'")')
             logs = cursor.fetchall()
         return JsonResponse(logs, safe=False)
     else:
@@ -54,7 +54,7 @@ def return_location(request):
         todate = request.POST.get('todate')
         serial = request.POST.get('serial_number')
         with connection.cursor() as cursor:
-            cursor.execute('SELECT * FROM app1_robotlog WHERE (timestamp BETWEEN "'+fromdate+'" AND "'+todate+'") AND (robot_id = "'+str(serial)+'")')
+            cursor.execute('SELECT robot_id, timestamp, location_latitude, location_longitude FROM app1_robotlog WHERE (timestamp BETWEEN "'+fromdate+'" AND "'+todate+'") AND (robot_id = "'+str(serial)+'")')
             logs = cursor.fetchall()
         return JsonResponse(logs, safe=False)
     else:
