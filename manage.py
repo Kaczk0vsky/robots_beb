@@ -2,11 +2,13 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+
 # from task1_beb.main import initialization
+
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'task1_beb.settings')
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task1_beb.settings")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
@@ -15,9 +17,9 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
-        
+
     execute_from_command_line(sys.argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

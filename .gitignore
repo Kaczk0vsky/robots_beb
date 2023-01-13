@@ -1,3 +1,5 @@
 data/
 .vscode/
 .log
+db.sqlite3
+*.sqlite3

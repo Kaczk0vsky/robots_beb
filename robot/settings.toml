@@ -1,8 +1,8 @@
 [robot_info]
-serial_number = '3'
-production_date = '2022-10-30'
-type = 'amphibian'
-company = 'LG Energy Solution'
+serial_number = '4'
+production_date = '2022-12-24'
+type = 'flying'
+company = 'Chesus'
 
 [mqtt]
 host = 'test.mosquitto.org'

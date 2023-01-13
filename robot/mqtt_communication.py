@@ -3,7 +3,14 @@ from paho.mqtt import client as mqtt
 from datetime import datetime
 
 from robot.settings_reader import mqtt_settings
-from robot.helper import time_in_seconds, robot_location, robot_telemetry, robot_timestamp, update_data, make_robot_info
+from robot.helper import (
+    time_in_seconds,
+    update_data,
+    make_robot_info,
+    robot_location,
+    robot_telemetry,
+    robot_timestamp,
+)
 
 logger = logging.getLogger(__name__)
 mqqt_config = mqtt_settings()
@@ -26,11 +33,14 @@ class TimeMessure:
 
 def mqtt_init():
     if "username" in mqqt_config:
-        client.username_pw_set(mqqt_config["username"], password = mqqt_config["password"])
+        client.username_pw_set(
+            mqqt_config["username"], password=mqqt_config["password"]
+        )
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
     client.connect(mqqt_config["host"], int(mqqt_config["port"]))
     client.subscribe(mqqt_config["topic"], 1)
+
 
 def on_connect(client, userdata, flags, rc):
     error_count = 0
@@ -42,25 +52,47 @@ def on_connect(client, userdata, flags, rc):
             logger.error(name + "Cannot connect to MQTT Server - return code %d\n", rc)
             error_count = error_count + 1
         if error_count == 5:
-            return logger.info(name + "Couldn`t connect to MQTT Server after several tries")
+            return logger.info(
+                name + "Couldn`t connect to MQTT Server after several tries"
+            )
 
     client.on_connect = on_connect
     return client
+
 
 def on_disconnect(client, userdata, flags, rc):
     logger.info(name + "Disconnected from MQTT Server. Trying to reconnect...")
     while rc != 0:
         client.connect(mqqt_config["host"], int(mqqt_config["port"]))
 
+
 def send_data():
     logger.info(name + f'Sent robot parameters on topic {mqqt_config["topic"]}.')
-    client.publish(f'{mqqt_config["topic"]}/robot_telemetry/timestamp', str(robot_timestamp["timestamp"]))
-    client.publish(f'{mqqt_config["topic"]}/robot_telemetry/humidity', robot_telemetry["humidity"])
-    client.publish(f'{mqqt_config["topic"]}/robot_telemetry/temperature', robot_telemetry["temperature"])
-    client.publish(f'{mqqt_config["topic"]}/robot_telemetry/pressure', robot_telemetry["pressure"])
-    client.publish(f'{mqqt_config["topic"]}/robot_location/timestamp', str(robot_timestamp["timestamp"]))
-    client.publish(f'{mqqt_config["topic"]}/robot_location/latitude', robot_location["latitude"])
-    client.publish(f'{mqqt_config["topic"]}/robot_location/longitude', robot_location["longitude"])
+    client.publish(
+        f'{mqqt_config["topic"]}/robot_telemetry/timestamp',
+        str(robot_timestamp["timestamp"]),
+    )
+    client.publish(
+        f'{mqqt_config["topic"]}/robot_telemetry/humidity', robot_telemetry["humidity"]
+    )
+    client.publish(
+        f'{mqqt_config["topic"]}/robot_telemetry/temperature',
+        robot_telemetry["temperature"],
+    )
+    client.publish(
+        f'{mqqt_config["topic"]}/robot_telemetry/pressure', robot_telemetry["pressure"]
+    )
+    client.publish(
+        f'{mqqt_config["topic"]}/robot_location/timestamp',
+        str(robot_timestamp["timestamp"]),
+    )
+    client.publish(
+        f'{mqqt_config["topic"]}/robot_location/latitude', robot_location["latitude"]
+    )
+    client.publish(
+        f'{mqqt_config["topic"]}/robot_location/longitude', robot_location["longitude"]
+    )
+
 
 def mqtt_loop_forever():
     client.loop_forever()
