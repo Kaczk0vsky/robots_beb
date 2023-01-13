@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Robot, RobotLog
+from .models import Robot
 
 
 class RobotsAdmin(admin.ModelAdmin):

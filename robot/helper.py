@@ -1,15 +1,14 @@
 import os
 import django
-#Crimes against humanity
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "app1.settings")
-django.setup()
-
-from task1_beb.settings_reader import robot_info
-from django.conf import settings
-from app1.models import Robot, RobotLog
-from django.utils import timezone
 import datetime
 import random
+from django.conf import settings
+from django.utils import timezone
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task1_beb.settings")
+django.setup()
+
+from robot.settings_reader import robot_info
+from app1.models import Robot, RobotLog
 
 #dicts containing robot data
 robot_telemetry = {

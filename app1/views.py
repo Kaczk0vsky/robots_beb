@@ -1,10 +1,10 @@
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from app1.models import Robot, RobotLog
 from django.template import loader
 from django.shortcuts import render
-from app1.forms import NewRobot
 from django.db import connection
 
+from app1.forms import NewRobot
+from app1.models import Robot, RobotLog
 
 def return_all_robots(request):
     robot_data = Robot.objects.all().count()
