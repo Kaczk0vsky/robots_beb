@@ -20,3 +20,12 @@ services:
       - POSTGRES_PASSWORD=postgres
     depends_on:
       - db
+  user_program:
+    build: .
+    command: python task1_beb/main.py
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+      - web
+    

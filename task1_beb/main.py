@@ -1,5 +1,5 @@
-from task1_beb.mqtt_communication import TimeMessure, mqtt_init, mqtt_loop_forever
-from task1_beb.helpers import add_robot
+from mqtt_communication import TimeMessure, mqtt_init, mqtt_loop_forever
+from task1_beb.helper import add_robot
 import logging
 import threading
 
@@ -22,3 +22,7 @@ def initialization():
 
     for thread in threads:
         thread.start()
+
+if __name__ == '__main__':
+    initialization()
+    

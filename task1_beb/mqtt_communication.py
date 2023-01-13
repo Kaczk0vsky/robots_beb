@@ -1,7 +1,7 @@
 from paho.mqtt import client as mqtt
 from task1_beb.settings_reader import mqtt_settings
 from datetime import datetime
-from task1_beb.helpers import time_in_seconds, robot_location, robot_telemetry, robot_timestamp, update_data, make_robot_info
+from task1_beb.helper import time_in_seconds, robot_location, robot_telemetry, robot_timestamp, update_data, make_robot_info
 import logging
 
 logger = logging.getLogger(__name__)
