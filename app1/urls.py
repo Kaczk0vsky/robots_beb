@@ -1,14 +1,13 @@
 from django.urls import path
-from .views import ReturnAllRobots, ReturnRobotData, AddNewRobot, ReturnTelemetry, ReturnLocation, ReturnLatestLocationOfAll, ModifyRobotBrand, GetRobotBrand
+from .views import return_all_robots, return_robot_data, add_new_robot, return_telemetry, return_location, return_latest_location, update_robot
 
 
 urlpatterns = [
-    path('return_all/', ReturnAllRobots, name='ReturnAllRobots'),
-    path('return_robot_data/', ReturnRobotData, name='ReturnRobotData'),
-    path('add_new/', AddNewRobot, name='AddNewRobot'),
-    path('return_telemetry/', ReturnTelemetry, name='ReturnTelemetry'),
-    path('return_location/', ReturnLocation, name='ReturnLocation'),
-    path('return_latest_location/', ReturnLatestLocationOfAll, name='ReturnLatestLocationOfAll'),
-    path('modify_robot/', GetRobotBrand, name='GetRobotBrand'),
-    path('modify_robot/modify/', ModifyRobotBrand, name='ModifyRobotBrand'),
+    path('return_all/', return_all_robots, name='ReturnAllRobots'),
+    path('return_robot_data/', return_robot_data, name='ReturnRobotData'),
+    path('add_new/', add_new_robot, name='AddNewRobot'),
+    path('return_telemetry/', return_telemetry, name='ReturnTelemetry'),
+    path('return_location/', return_location, name='ReturnLocation'),
+    path('return_latest_location/', return_latest_location, name='ReturnLatestLocationOfAll'),
+    path('modify_robot/', update_robot, name='UpdateRobotBrand'),
 ]

@@ -6,7 +6,7 @@ from app1.forms import NewRobot
 from django.db import connection
 
 
-def ReturnAllRobots(request):
+def return_all_robots(request):
     robot_data = Robot.objects.all().count()
     index = 1
     data = {}
@@ -15,7 +15,7 @@ def ReturnAllRobots(request):
         index+=1
     return JsonResponse({'robot_data': data})
     
-def ReturnRobotData(request):
+def return_robot_data(request):
     robot_data = Robot.objects.all().count()
     index = 1
     data = {}
@@ -24,7 +24,7 @@ def ReturnRobotData(request):
         index+=1
     return JsonResponse({'robot_data': data})
 
-def AddNewRobot(request):
+def add_new_robot(request):
     if request.method == 'POST':
         form = NewRobot(request.POST)
         if form.is_valid():
@@ -34,64 +34,48 @@ def AddNewRobot(request):
         form = NewRobot()
     return render(request, 'add_new.html')
 
-def ReturnTelemetry(request):
+def return_telemetry(request):
     template = loader.get_template('return_telemetry.html')
     if request.method == 'POST':
         fromdate = request.POST.get('fromdate')
         todate = request.POST.get('todate')
         serial = request.POST.get('serial_number')
-        logs = RobotLog.objects.raw('SELECT * FROM app1_robotlog WHERE (timestamp BETWEEN "'+fromdate+'" AND "'+todate+'") AND (robot_id = "'+str(serial)+'")')
-        data = {
-            'robots': logs,
-        }
-        return HttpResponse(template.render(data, request))
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT * FROM app1_robotlog WHERE (timestamp BETWEEN "'+fromdate+'" AND "'+todate+'") AND (robot_id = "'+str(serial)+'")')
+            logs = cursor.fetchall()
+        return JsonResponse({'robot_data': logs})
     else:
-        robot_data = Robot.objects.all().values()
-        data = {
-            'robots': robot_data,
-        }
-        return HttpResponse(template.render(data, request))
+        return HttpResponse(template.render({}, request))
 
-def ReturnLocation(request):
+def return_location(request):
     template = loader.get_template('return_location.html')
     if request.method == 'POST':
         fromdate = request.POST.get('fromdate')
         todate = request.POST.get('todate')
         serial = request.POST.get('serial_number')
-        logs = RobotLog.objects.raw('SELECT * FROM app1_robotlog WHERE (timestamp BETWEEN "'+fromdate+'" AND "'+todate+'") AND (robot_id = "'+str(serial)+'")')
-        data = {
-            'robots': logs,
-        }
-        return HttpResponse(template.render(data, request))
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT * FROM app1_robotlog WHERE (timestamp BETWEEN "'+fromdate+'" AND "'+todate+'") AND (robot_id = "'+str(serial)+'")')
+            logs = cursor.fetchall()
+        return JsonResponse({'robot_data': logs})
     else:
-        robot_data = Robot.objects.all().values()
-        data = {
-            'robots': robot_data,
-        }
-        return HttpResponse(template.render(data, request))
+        return HttpResponse(template.render({}, request))
 
-def ReturnLatestLocationOfAll(request):
+def return_latest_location(request):
     robot_data = Robot.objects.all().count()
     index = 1
     data = {}
     while index <= robot_data:
         data[index] = f"{RobotLog.objects.filter(robot_id=index).values_list('timestamp', 'location_latitude', 'location_longitude').last()}"
         index+=1
-    print(data)
     return JsonResponse({'robot_data': data})
 
-def GetRobotBrand(request):
-    robot_data = Robot.objects.all().values()
-    template = loader.get_template('modify_robot.html')
-    data = {
-        'robots': robot_data,
-    }
+def update_robot(request):
+    if request.method=='POST':
+        serial = request.POST['serial_number']
+        type = request.POST['type']
+        Robot.objects.filter(pk=serial).update(type = type)
+        return HttpResponseRedirect('/app1/return_all/')
+    else:
+        template = loader.get_template('modify_robot.html')
     
-    return HttpResponse(template.render(data, request))
-
-def ModifyRobotBrand(request):
-    serial = request.POST['serial_number']
-    type = request.POST['type']
-    Robot.objects.filter(pk=serial).update(type = type)
-    
-    return HttpResponseRedirect('/app1/return_all/')
+    return HttpResponse(template.render({}, request))
