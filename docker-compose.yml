@@ -1,13 +1,17 @@
 services:
   db:
+    container_name: robots-database
     image: postgres
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=${DJANGO_DATABASE_NAME}
+      - POSTGRES_USER=${DJANGO_DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=${DJANGO_DATABASE_PASSWORD}
+    env_file:
+      - .env
   web:
+    container_name: django-service
     build: .
     command: python manage.py runserver 0.0.0.0:8000 --noreload
     volumes:
@@ -15,12 +19,15 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_NAME=${DJANGO_DATABASE_NAME}
+      - POSTGRES_USER=${DJANGO_DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=${DJANGO_DATABASE_PASSWORD}
     depends_on:
       - db
+    env_file:
+      - .env
   user_program:
+    container_name: user-program
     build: .
     command: sh -c "cd /code/robot && python3 main.py"
     volumes:
@@ -28,3 +35,5 @@ services:
     depends_on:
       - db
       - web
+    env_file:
+      - .env
