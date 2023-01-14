@@ -3,3 +3,5 @@ psycopg2>=2.8
 paho-mqtt>=1.6.1
 toml>=0.10.2
 dump-env>=1.4.0
+celery>=5.2.7
+redis>=4.4.2

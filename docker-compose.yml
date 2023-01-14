@@ -22,6 +22,8 @@ services:
       - POSTGRES_NAME=${DJANGO_DATABASE_NAME}
       - POSTGRES_USER=${DJANGO_DATABASE_USERNAME}
       - POSTGRES_PASSWORD=${DJANGO_DATABASE_PASSWORD}
+      - CELERY_BROKER=${CELERY_BROKER}
+      - CELERY_BACKEND=${CELERY_BACKEND}
     depends_on:
       - db
     env_file:
@@ -37,3 +39,21 @@ services:
       - web
     env_file:
       - .env
+  celery:
+    container_name: celery
+    build: .
+    command: celery -A task1_beb worker -l INFO
+    volumes:
+      - .:/code
+    environment:
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1
+      - CELERY_BROKER=${CELERY_BROKER}
+      - CELERY_BACKEND=${CELERY_BACKEND}
+    depends_on:
+      - web
+      - redis
+    env_file:
+      - .env
+  redis:
+    container_name: redis
+    image: "redis:alpine"
