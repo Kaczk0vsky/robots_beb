@@ -40,7 +40,9 @@ class Robot(models.Model):
     production_date = models.DateField()
     # robot type created from ROBOT_TYPE_CHOICES
     type = models.CharField(
-        max_length=10, choices=ROBOT_TYPES_CHOICES, default="4 wheeler"
+        max_length=10,
+        choices=ROBOT_TYPES_CHOICES,
+        default="4 wheeler",
     )
     # robot company which own it
     company = models.CharField(max_length=256)

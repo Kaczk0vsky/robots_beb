@@ -8,7 +8,7 @@ from django.utils import timezone
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task1_beb.settings")
 django.setup()
 
-from robot.settings_reader import robot_info
+from robot.settings_reader import robot_info, robot_sensors
 from app1.models import Robot, RobotLog
 
 # dicts containing robot data
@@ -26,6 +26,9 @@ robot_location = {
 robot_timestamp = {
     "timestamp": timezone.now(),
 }
+
+sensors_data = {}
+mqtt_topics = {}
 
 
 def time_in_seconds(time_messured):
@@ -55,6 +58,29 @@ def update_data():
         location_longitude=robot_location["longitude"],
     )
 
+    # update sensor data dict
+    robot = robot_sensors()
+    index = 1
+    data_dict = {
+        "timestamp": "41D8AC346C2F4A4D",
+        "humidity": str(robot_telemetry["humidity"]),
+        "temperature": str(robot_telemetry["temperature"]),
+        "pressure": str(robot_telemetry["pressure"]),
+        "latitude": "40495412306E0359",
+        "longitude": "4031DDF35233DB02",
+    }
+    # robot_timestamp["timestamp"] = hex(str(timezone.now()))
+    # print(robot_timestamp["timestamp"])
+    robot["telemetry"] = int(robot["telemetry"])
+    robot["location"] = int(robot["location"])
+    number_of_sensors = robot["telemetry"] + robot["location"]
+    while index < number_of_sensors:
+        if index < 10:
+            sensors_data[f"SNR0{index}"] = data_dict
+        else:
+            sensors_data[f"SNR{index}"] = data_dict
+        index += 1
+
 
 def make_robot_info():
     robot = robot_info()
@@ -72,3 +98,38 @@ def add_robot():
             type=robot["type"],
             company=robot["company"],
         ).save()
+
+
+def create_sensors():
+    robot = robot_sensors()
+    robot["telemetry"] = int(robot["telemetry"])
+    robot["location"] = int(robot["location"])
+    number_of_sensors = robot["telemetry"] + robot["location"]
+    index = 1
+    while index <= number_of_sensors:
+        x = index + number_of_sensors
+        if number_of_sensors < 10:
+            temp_dict = {f"SNR0{index}": ""}
+            if robot["telemetry"] >= 1:
+                temp_topic = {f"SNR0{index}": f"sensors/SNR0{index}/telemetry"}
+                fault_log = {f"SNR{x}": f"sensors/SNR0{index}/fault_log"}
+                robot["telemetry"] -= 1
+            elif robot["location"] >= 1:
+                temp_topic = {f"SNR0{index}": f"sensors/SNR0{index}/location"}
+                fault_log = {f"SNR{x}": f"sensors/SNR0{index}/fault_log"}
+                robot["location"] -= 1
+        else:
+            temp_dict = {f"SNR{index}": ""}
+            if robot["telemetry"] >= 1:
+                temp_topic = {f"SNR{index}": f"sensors/SNR{index}/telemetry"}
+                fault_log = {f"SNR{x}": f"sensors/SNR{index}/fault_log"}
+                robot["telemetry"] -= 1
+            elif robot["location"] >= 1:
+                temp_topic = {f"SNR{index}": f"sensors/SNR{index}/location"}
+                fault_log = {f"SNR{x}": f"sensors/SNR{index}/fault_log"}
+                robot["location"] -= 1
+        sensors_data.update(temp_dict)
+        mqtt_topics.update(temp_topic)
+        mqtt_topics.update(fault_log)
+        index += 1
+    print(mqtt_topics)

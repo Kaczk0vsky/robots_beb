@@ -1,7 +1,7 @@
 [robot_info]
 serial_number = '1'
-production_date = '2022-12-24'
-type = 'flying'
+production_date = '2022-12-28'
+type = '4 wheeler'
 company = '3M'
 
 [mqtt]
@@ -11,3 +11,7 @@ username = ''
 password = ''
 topic = 'task1_beb'
 interval_time = '10'
+
+[sensors]
+telemetry = '3'
+location = '2'

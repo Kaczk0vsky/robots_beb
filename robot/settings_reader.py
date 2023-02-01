@@ -12,3 +12,9 @@ def mqtt_settings():
     return toml.load(os.path.dirname(os.path.abspath(__file__)) + "/settings.toml")[
         "mqtt"
     ]
+
+
+def robot_sensors():
+    return toml.load(os.path.dirname(os.path.abspath(__file__)) + "/settings.toml")[
+        "sensors"
+    ]

@@ -2,7 +2,7 @@ import logging
 from paho.mqtt import client as mqtt
 from datetime import datetime
 
-from robot.settings_reader import mqtt_settings
+from robot.settings_reader import mqtt_settings, robot_info
 from robot.helper import (
     time_in_seconds,
     update_data,
@@ -10,10 +10,12 @@ from robot.helper import (
     robot_location,
     robot_telemetry,
     robot_timestamp,
+    mqtt_topics,
 )
 
 logger = logging.getLogger(__name__)
 mqqt_config = mqtt_settings()
+robot_data = robot_info()
 client = mqtt.Client()
 name = make_robot_info()
 
@@ -68,30 +70,11 @@ def on_disconnect(client, userdata, flags, rc):
 
 def send_data():
     logger.info(name + f'Sent robot parameters on topic {mqqt_config["topic"]}.')
-    client.publish(
-        f'{mqqt_config["topic"]}/robot_telemetry/timestamp',
-        str(robot_timestamp["timestamp"]),
-    )
-    client.publish(
-        f'{mqqt_config["topic"]}/robot_telemetry/humidity', robot_telemetry["humidity"]
-    )
-    client.publish(
-        f'{mqqt_config["topic"]}/robot_telemetry/temperature',
-        robot_telemetry["temperature"],
-    )
-    client.publish(
-        f'{mqqt_config["topic"]}/robot_telemetry/pressure', robot_telemetry["pressure"]
-    )
-    client.publish(
-        f'{mqqt_config["topic"]}/robot_location/timestamp',
-        str(robot_timestamp["timestamp"]),
-    )
-    client.publish(
-        f'{mqqt_config["topic"]}/robot_location/latitude', robot_location["latitude"]
-    )
-    client.publish(
-        f'{mqqt_config["topic"]}/robot_location/longitude', robot_location["longitude"]
-    )
+    for x in mqtt_topics:
+        client.publish(
+            f'{robot_data["serial_number"]}/{mqtt_topics[x]}',
+            "smth",
+        )
 
 
 def mqtt_loop_forever():
