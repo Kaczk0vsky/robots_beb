@@ -5,7 +5,7 @@ type = '4 wheeler'
 company = '3M'
 
 [mqtt]
-host = 'test.mosquitto.org'
+host = '10.50.25.112'
 port = '1883'
 username = ''
 password = ''

@@ -1,4 +1,5 @@
 import logging
+import json
 from paho.mqtt import client as mqtt
 from datetime import datetime
 
@@ -11,6 +12,7 @@ from robot.helper import (
     robot_telemetry,
     robot_timestamp,
     mqtt_topics,
+    sensors_data,
 )
 
 logger = logging.getLogger(__name__)
@@ -40,6 +42,7 @@ def mqtt_init():
         )
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
+    client.on_message = on_message
     client.connect(mqqt_config["host"], int(mqqt_config["port"]))
     client.subscribe(mqqt_config["topic"], 1)
 
@@ -71,10 +74,36 @@ def on_disconnect(client, userdata, flags, rc):
 def send_data():
     logger.info(name + f'Sent robot parameters on topic {mqqt_config["topic"]}.')
     for x in mqtt_topics:
-        client.publish(
-            f'{robot_data["serial_number"]}/{mqtt_topics[x]}',
-            "smth",
-        )
+        if "telemetry" in mqtt_topics[x]:
+            temp = {
+                "timestamp": sensors_data["timestamp"],
+                "humidity": sensors_data["humidity"],
+                "temperature": sensors_data["temperature"],
+                "pressure": sensors_data["pressure"],
+            }
+            client.publish(
+                f'Robot serial: {robot_data["serial_number"]}/{mqtt_topics[x]}',
+                json.dumps(temp),
+            )
+        elif "location" in mqtt_topics[x]:
+            temp = {
+                "timestamp": sensors_data["timestamp"],
+                "latitude": sensors_data["latitude"],
+                "longitude": sensors_data["longitude"],
+            }
+            client.publish(
+                f'Robot serial: {robot_data["serial_number"]}/{mqtt_topics[x]}',
+                f'timestamp: {sensors_data["timestamp"]}, ',
+            )
+        else:
+            client.publish(
+                f'Robot serial: {robot_data["serial_number"]}/{mqtt_topics[x]}',
+                json.dumps(sensors_data["fault_log"]),
+            )
+
+
+def on_message(client, userdata, flags, rc):
+    logger.info(name + "Got message:" + userdata)
 
 
 def mqtt_loop_forever():

@@ -60,7 +60,13 @@ def update_data():
 
     # update sensor data dict
     robot = robot_sensors()
-    index = 1
+
+    random_fault = random.randint(0, 100)
+    if random_fault >= 40 and random_fault <= 60:
+        fault_log = "fault detected"
+    else:
+        fault_log = ""
+
     data_dict = {
         "timestamp": "41D8AC346C2F4A4D",
         "humidity": str(robot_telemetry["humidity"]),
@@ -68,18 +74,22 @@ def update_data():
         "pressure": str(robot_telemetry["pressure"]),
         "latitude": "40495412306E0359",
         "longitude": "4031DDF35233DB02",
+        "fault_log": fault_log,
     }
     # robot_timestamp["timestamp"] = hex(str(timezone.now()))
     # print(robot_timestamp["timestamp"])
     robot["telemetry"] = int(robot["telemetry"])
     robot["location"] = int(robot["location"])
     number_of_sensors = robot["telemetry"] + robot["location"]
-    while index < number_of_sensors:
+    index = 1
+    while index <= number_of_sensors:
+        x = index + number_of_sensors
         if index < 10:
             sensors_data[f"SNR0{index}"] = data_dict
         else:
             sensors_data[f"SNR{index}"] = data_dict
         index += 1
+        sensors_data.update(data_dict)
 
 
 def make_robot_info():
@@ -108,8 +118,7 @@ def create_sensors():
     index = 1
     while index <= number_of_sensors:
         x = index + number_of_sensors
-        if number_of_sensors < 10:
-            temp_dict = {f"SNR0{index}": ""}
+        if index < 10:
             if robot["telemetry"] >= 1:
                 temp_topic = {f"SNR0{index}": f"sensors/SNR0{index}/telemetry"}
                 fault_log = {f"SNR{x}": f"sensors/SNR0{index}/fault_log"}
@@ -119,7 +128,6 @@ def create_sensors():
                 fault_log = {f"SNR{x}": f"sensors/SNR0{index}/fault_log"}
                 robot["location"] -= 1
         else:
-            temp_dict = {f"SNR{index}": ""}
             if robot["telemetry"] >= 1:
                 temp_topic = {f"SNR{index}": f"sensors/SNR{index}/telemetry"}
                 fault_log = {f"SNR{x}": f"sensors/SNR{index}/fault_log"}
@@ -128,8 +136,6 @@ def create_sensors():
                 temp_topic = {f"SNR{index}": f"sensors/SNR{index}/location"}
                 fault_log = {f"SNR{x}": f"sensors/SNR{index}/fault_log"}
                 robot["location"] -= 1
-        sensors_data.update(temp_dict)
         mqtt_topics.update(temp_topic)
         mqtt_topics.update(fault_log)
         index += 1
-    print(mqtt_topics)
