@@ -93,7 +93,7 @@ def send_data():
             }
             client.publish(
                 f'Robot serial: {robot_data["serial_number"]}/{mqtt_topics[x]}',
-                f'timestamp: {sensors_data["timestamp"]}, ',
+                json.dumps(temp),
             )
         else:
             client.publish(
