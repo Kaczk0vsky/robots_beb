@@ -42,7 +42,6 @@ def mqtt_init():
         )
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
-    client.on_message = on_message
     client.connect(mqqt_config["host"], int(mqqt_config["port"]))
     client.subscribe(mqqt_config["topic"], 1)
 
@@ -100,10 +99,6 @@ def send_data():
                 f'Robot serial: {robot_data["serial_number"]}/{mqtt_topics[x]}',
                 json.dumps(sensors_data["fault_log"]),
             )
-
-
-def on_message(client, userdata, flags, rc):
-    logger.info(name + "Got message:" + userdata)
 
 
 def mqtt_loop_forever():

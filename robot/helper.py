@@ -40,12 +40,18 @@ def update_data():
     robot = robot_info()
 
     # randomizing data send:
-    robot_timestamp["timestamp"] = timezone.now()
-    robot_telemetry["humidity"] = random.randint(0, 100)
-    robot_telemetry["temperature"] = random.randint(-10, 40)
-    robot_telemetry["pressure"] = random.randint(970, 1030)
-    robot_location["latitude"] = random.randint(0, 90)
-    robot_location["longitude"] = random.randint(0, 90)
+    robot_timestamp["timestamp"] = str(timezone.now())
+    timestamp = robot_timestamp["timestamp"].encode(encoding="UTF-8").hex()
+    robot_telemetry["humidity"] = str(random.randint(0, 100))
+    humidity = robot_telemetry["humidity"].encode(encoding="UTF-8").hex()
+    robot_telemetry["temperature"] = str(random.randint(-10, 40))
+    temperature = robot_telemetry["temperature"].encode(encoding="UTF-8").hex()
+    robot_telemetry["pressure"] = str(random.randint(970, 1030))
+    pressure = robot_telemetry["pressure"].encode(encoding="UTF-8").hex()
+    robot_location["latitude"] = str(random.randint(0, 90))
+    latitude = robot_location["latitude"].encode(encoding="UTF-8").hex()
+    robot_location["longitude"] = str(random.randint(0, 90))
+    longitude = robot_location["longitude"].encode(encoding="UTF-8").hex()
 
     # saving latest robot data
     RobotLog.objects.filter(robot_id=robot["serial_number"]).update_or_create(
@@ -68,16 +74,15 @@ def update_data():
         fault_log = ""
 
     data_dict = {
-        "timestamp": "41D8AC346C2F4A4D",
-        "humidity": str(robot_telemetry["humidity"]),
-        "temperature": str(robot_telemetry["temperature"]),
-        "pressure": str(robot_telemetry["pressure"]),
-        "latitude": "40495412306E0359",
-        "longitude": "4031DDF35233DB02",
+        "timestamp": timestamp,
+        "humidity": humidity,
+        "temperature": temperature,
+        "pressure": pressure,
+        "latitude": latitude,
+        "longitude": longitude,
         "fault_log": fault_log,
     }
-    # robot_timestamp["timestamp"] = hex(str(timezone.now()))
-    # print(robot_timestamp["timestamp"])
+
     robot["telemetry"] = int(robot["telemetry"])
     robot["location"] = int(robot["location"])
     number_of_sensors = robot["telemetry"] + robot["location"]
