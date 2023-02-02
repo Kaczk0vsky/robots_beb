@@ -34,17 +34,17 @@ class TimeMessure:
 
 
 def mqtt_init():
-    username = os.getenv["MQTT_CLIENT_PASSWORD"]
-    if not username:
+    mqtt_username = os.getenv("MQTT_CLIENT_USERNAME")
+    if not mqtt_username:
         pass
     else:
         client.username_pw_set(
-            username=os.getenv["MQTT_CLIENT_USERNAME"],
-            password=os.getenv["MQTT_CLIENT_PASSWORD"],
+            username=str(os.getenv("MQTT_CLIENT_USERNAME")),
+            password=str(os.getenv("MQTT_CLIENT_PASSWORD")),
         )
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
-    client.connect(os.getenv["MQTT_CLIENT_HOST"], int(os.getenv["MQTT_CLIENT_PORT"]))
+    client.connect(os.getenv("MQTT_CLIENT_HOST"), int(os.getenv("MQTT_CLIENT_PORT")))
     client.subscribe(mqqt_config["topic"], 1)
 
 
