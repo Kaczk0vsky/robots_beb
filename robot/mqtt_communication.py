@@ -1,5 +1,6 @@
 import logging
 import json
+import os
 from paho.mqtt import client as mqtt
 from datetime import datetime
 
@@ -8,9 +9,6 @@ from robot.helper import (
     time_in_seconds,
     update_data,
     make_robot_info,
-    robot_location,
-    robot_telemetry,
-    robot_timestamp,
     mqtt_topics,
     sensors_data,
 )
@@ -36,13 +34,17 @@ class TimeMessure:
 
 
 def mqtt_init():
-    if "username" in mqqt_config:
+    username = os.getenv["MQTT_CLIENT_PASSWORD"]
+    if not username:
+        pass
+    else:
         client.username_pw_set(
-            mqqt_config["username"], password=mqqt_config["password"]
+            username=os.getenv["MQTT_CLIENT_USERNAME"],
+            password=os.getenv["MQTT_CLIENT_PASSWORD"],
         )
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
-    client.connect(mqqt_config["host"], int(mqqt_config["port"]))
+    client.connect(os.getenv["MQTT_CLIENT_HOST"], int(os.getenv["MQTT_CLIENT_PORT"]))
     client.subscribe(mqqt_config["topic"], 1)
 
 

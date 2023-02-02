@@ -5,10 +5,6 @@ type = '4 wheeler'
 company = '3M'
 
 [mqtt]
-host = '10.50.25.112'
-port = '1883'
-username = ''
-password = ''
 topic = 'task1_beb'
 interval_time = '10'
 
