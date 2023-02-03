@@ -1,12 +1,13 @@
 import os
-
-from celery import Celery
+from celery import Celery, shared_task
+from paho.mqtt import client as mqtt
 
 
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task1_beb.settings")
 
 app = Celery("task1_beb")
+client = mqtt.Client()
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.
@@ -18,6 +19,9 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 
-@app.task(bind=True)
-def debug_task(self):
-    print(f"Request: {self.request!r}")
+@shared_task
+def mqtt_send(robot_serial, robot_topic, robot_data):
+    client.publish(
+        f"Robot serial: {robot_serial}/{robot_topic}",
+        robot_data,
+    )

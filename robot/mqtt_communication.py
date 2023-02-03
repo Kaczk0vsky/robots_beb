@@ -5,6 +5,7 @@ from paho.mqtt import client as mqtt
 from datetime import datetime
 
 from robot.settings_reader import mqtt_settings, robot_info
+from task1_beb.celery import mqtt_send
 from robot.helper import (
     time_in_seconds,
     update_data,
@@ -12,8 +13,6 @@ from robot.helper import (
     mqtt_topics,
     sensors_data,
 )
-
-from task1_beb.celery import debug_task
 
 logger = logging.getLogger(__name__)
 mqqt_config = mqtt_settings()
@@ -37,7 +36,7 @@ class MqttComunication:
         client.connect(
             os.getenv("MQTT_CLIENT_HOST"), int(os.getenv("MQTT_CLIENT_PORT"))
         )
-        client.subscribe(mqqt_config["topic"], 1)
+        client.subscribe(f"Robot serial: {robot_data['serial_number']}", 1)
 
     def on_connect(self, client, userdata, flags, rc):
         error_count = 0
@@ -70,10 +69,9 @@ class MqttComunication:
             client.connect(mqqt_config["host"], int(mqqt_config["port"]))
 
     def send_data(self):
-        # debug_task()
         logger.info(
             make_robot_info()
-            + f'Sent robot parameters on topic {mqqt_config["topic"]}.'
+            + f"Sent robot parameters on topic - Robot serial: {robot_data['serial_number']}."
         )
         for x in mqtt_topics:
             if "telemetry" in mqtt_topics[x]:
@@ -83,9 +81,8 @@ class MqttComunication:
                     "temperature": sensors_data["temperature"],
                     "pressure": sensors_data["pressure"],
                 }
-                client.publish(
-                    f'Robot serial: {robot_data["serial_number"]}/{mqtt_topics[x]}',
-                    json.dumps(temp),
+                mqtt_send.delay(
+                    robot_data["serial_number"], mqtt_topics[x], json.dumps(temp)
                 )
             elif "location" in mqtt_topics[x]:
                 temp = {
@@ -93,14 +90,12 @@ class MqttComunication:
                     "latitude": sensors_data["latitude"],
                     "longitude": sensors_data["longitude"],
                 }
-                client.publish(
-                    f'Robot serial: {robot_data["serial_number"]}/{mqtt_topics[x]}',
-                    json.dumps(temp),
+                mqtt_send.delay(
+                    robot_data["serial_number"], mqtt_topics[x], json.dumps(temp)
                 )
             else:
-                client.publish(
-                    f'Robot serial: {robot_data["serial_number"]}/{mqtt_topics[x]}',
-                    json.dumps(sensors_data["fault_log"]),
+                mqtt_send.delay(
+                    robot_data["serial_number"], mqtt_topics[x], json.dumps(temp)
                 )
 
     def mqtt_loop_forever(self):

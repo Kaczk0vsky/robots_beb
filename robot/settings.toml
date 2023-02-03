@@ -6,7 +6,7 @@ company = '3M'
 
 [mqtt]
 topic = 'task1_beb'
-interval_time = '3'
+interval_time = '10'
 
 [sensors]
 telemetry = '3'
