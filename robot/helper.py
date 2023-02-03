@@ -11,6 +11,7 @@ django.setup()
 
 from robot.settings_reader import robot_info, robot_sensors
 from app1.models import Robot, RobotLog
+from task1_beb.celery import save_robot_data
 
 
 # dicts containing robot data
@@ -56,15 +57,15 @@ def update_data():
     longitude = robot_location["longitude"].encode(encoding="UTF-8").hex()
 
     # saving latest robot data
-    RobotLog.objects.filter(robot_id=robot["serial_number"]).update_or_create(
-        robot_id=robot["serial_number"],
-        timestamp=robot_timestamp["timestamp"],
-        telemetry_humidity=robot_telemetry["humidity"],
-        telemetry_temperature=robot_telemetry["temperature"],
-        telemetry_pressure=robot_telemetry["pressure"],
-        location_latitude=robot_location["latitude"],
-        location_longitude=robot_location["longitude"],
-    )
+    # RobotLog.objects.filter(robot_id=robot["serial_number"]).update_or_create(
+    #     robot_id=robot["serial_number"],
+    #     timestamp=robot_timestamp["timestamp"],
+    #     telemetry_humidity=robot_telemetry["humidity"],
+    #     telemetry_temperature=robot_telemetry["temperature"],
+    #     telemetry_pressure=robot_telemetry["pressure"],
+    #     location_latitude=robot_location["latitude"],
+    #     location_longitude=robot_location["longitude"],
+    # )
 
     # update sensor data dict
     robot = robot_sensors()
@@ -84,6 +85,16 @@ def update_data():
         "longitude": longitude,
         "fault_log": fault_log,
     }
+
+    # update sensor data dict
+    save_robot_data.delay(
+        robot_timestamp["timestamp"],
+        robot_telemetry["humidity"],
+        robot_telemetry["temperature"],
+        robot_telemetry["pressure"],
+        robot_location["latitude"],
+        robot_location["longitude"],
+    )
 
     robot["telemetry"] = int(robot["telemetry"])
     robot["location"] = int(robot["location"])
