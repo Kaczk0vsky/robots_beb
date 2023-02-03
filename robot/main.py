@@ -4,7 +4,7 @@ import threading
 
 sys.path.append("..")
 
-from robot.mqtt_communication import TimeMessure, mqtt_init, mqtt_loop_forever
+from robot.mqtt_communication import MqttComunication, TimeMessure
 from robot.helper import add_robot, create_sensors
 
 
@@ -19,11 +19,11 @@ def initialization():
     logger = logging.getLogger(__name__)
 
     # Initializing MQTT communication
-    mqtt_init()
+    mqtt = MqttComunication()
 
     # Starting threading
     threads = []
-    threads.append(threading.Thread(target=mqtt_loop_forever, daemon=True))
+    threads.append(threading.Thread(target=mqtt.mqtt_loop_forever, daemon=True))
     mqtt_time = TimeMessure()
     threads.append(threading.Thread(target=mqtt_time.loop_forever))
 

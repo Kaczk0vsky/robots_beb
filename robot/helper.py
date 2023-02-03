@@ -2,14 +2,24 @@ import os
 import django
 import datetime
 import random
+import logging
+import json
 from django.conf import settings
 from django.utils import timezone
+from paho.mqtt import client as mqtt
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task1_beb.settings")
 django.setup()
 
-from robot.settings_reader import robot_info, robot_sensors
+from robot.settings_reader import robot_info, robot_sensors, mqtt_settings
 from app1.models import Robot, RobotLog
+
+
+logger = logging.getLogger(__name__)
+mqqt_config = mqtt_settings()
+robot_data = robot_info()
+client = mqtt.Client()
+
 
 # dicts containing robot data
 robot_telemetry = {
