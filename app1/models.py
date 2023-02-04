@@ -34,7 +34,7 @@ class Robot(models.Model):
 
 # class for robot instance
 class Log(models.Model):
-    # robot id
+    # unique id
     id = models.IntegerField(editable=False, primary_key=True, unique=True)
     # robot telemetry timestamp param
     timestamp = models.DateTimeField(default=timezone.now, editable=False)

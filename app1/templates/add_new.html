@@ -1,23 +1,33 @@
 <!DOCTYPE html>
 <html>
-<body>
 
-<form action="/app1/add_new/" method="post">
-    {% csrf_token %}
-    <table border='1'>
-        <td><p>Serial number:</p></td>
-        <td><p>Production date (YYYY-MM-DD):</p></td>
-        <td><p>Type:</p></td>
-        <td><p>Company:</p></td>
+<body>
+  <center>
+    <form action="/app1/add_new/" method="post">
+      {% csrf_token %}
+      <table border='1'>
+        <td>
+          <p>Serial number:</p>
+        </td>
+        <td>
+          <p>Production date (YYYY-MM-DD):</p>
+        </td>
+        <td>
+          <p>Type:</p>
+        </td>
+        <td>
+          <p>Company:</p>
+        </td>
         <tr>
           <td><input id="serial_number" type="text" name="serial_number" maxlength="5" required></td>
           <td><input id="production_date" type="text" name="production_date" maxlength="10" required></td>
           <td><input id="type" type="text" name="type" maxlength="10" required></td>
           <td><input id="company" type="text" name="company" maxlength="20" required></td>
         </tr>
-    </table>
-    <input type="submit" value="Add robot">
-</form>
-
+      </table>
+      <input type="submit" value="Add robot">
+    </form>
+  </center>
 </body>
-</html>  
+
+</html>

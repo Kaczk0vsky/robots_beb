@@ -10,7 +10,7 @@ from rest_framework.decorators import api_view
 
 from app1.serializers import UserSerializer, GroupSerializer
 from app1.forms import NewRobot
-from app1.models import Robot, RobotLog
+from app1.models import Robot, RobotLog, Log
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -54,13 +54,15 @@ def return_robot_data(request):
     index = 1
     data = {}
     while index <= robot_data:
-        data[
-            index
-        ] = f"{Robot.objects.filter(pk=index).values_list('serial_number', 'production_date', 'type', 'company').get()}, {RobotLog.objects.filter(robot_id=index).values_list('robot_id', 'timestamp', 'telemetry_humidity', 'telemetry_temperature', 'telemetry_pressure', 'location_latitude', 'location_longitude').last()}"
+        data[index] = (
+            f"{Robot.objects.filter(serial_number=index).values_list('production_date', 'type', 'company').get()}"
+            + f"{Log.objects.filter(id=index).values_list('timestamp', 'telemetry_humidity', 'telemetry_temperature', 'telemetry_pressure', 'location_latitude', 'location_longitude').last()}"
+        )
         index += 1
     return Response(data)
 
 
+@api_view(["GET", "POST"])
 def add_new_robot(request):
     if request.method == "POST":
         form = NewRobot(request.POST)
@@ -72,62 +74,80 @@ def add_new_robot(request):
     return render(request, "add_new.html")
 
 
+@api_view(["GET", "POST"])
 def return_telemetry(request):
     template = loader.get_template("return_telemetry.html")
     if request.method == "POST":
         fromdate = request.POST.get("fromdate")
         todate = request.POST.get("todate")
         serial = request.POST.get("serial_number")
-        with connection.cursor() as cursor:
-            cursor.execute(
-                'SELECT robot_id, timestamp, telemetry_humidity, telemetry_temperature, telemetry_pressure FROM app1_robotlog WHERE (timestamp BETWEEN "'
-                + fromdate
-                + '" AND "'
-                + todate
-                + '") AND (robot_id = "'
-                + str(serial)
-                + '")'
+        data = RobotLog.objects.filter(robot_id=serial).values("log_id")
+
+        dict = {}
+        index = 0
+        for x in data:
+            log_ids = Log.objects.filter(
+                timestamp__range=[fromdate, todate],
+                id=x["log_id"],
+            ).values(
+                "timestamp",
+                "telemetry_humidity",
+                "telemetry_temperature",
+                "telemetry_pressure",
             )
-            logs = cursor.fetchall()
-        return JsonResponse(logs, safe=False)
+            dict[index + 1] = log_ids
+            index += 1
+        return Response(dict)
     else:
         return HttpResponse(template.render({}, request))
 
 
+@api_view(["GET", "POST"])
 def return_location(request):
     template = loader.get_template("return_location.html")
     if request.method == "POST":
         fromdate = request.POST.get("fromdate")
         todate = request.POST.get("todate")
         serial = request.POST.get("serial_number")
-        with connection.cursor() as cursor:
-            cursor.execute(
-                'SELECT robot_id, timestamp, location_latitude, location_longitude FROM app1_robotlog WHERE (timestamp BETWEEN "'
-                + fromdate
-                + '" AND "'
-                + todate
-                + '") AND (robot_id = "'
-                + str(serial)
-                + '")'
+        data = RobotLog.objects.filter(robot_id=serial).values("log_id")
+
+        dict = {}
+        index = 0
+        for x in data:
+            log_ids = Log.objects.filter(
+                timestamp__range=[fromdate, todate],
+                id=x["log_id"],
+            ).values(
+                "timestamp",
+                "location_latitude",
+                "location_longitude",
             )
-            logs = cursor.fetchall()
-        return JsonResponse(logs, safe=False)
+            dict[index + 1] = log_ids
+            index += 1
+        return Response(dict)
     else:
         return HttpResponse(template.render({}, request))
 
 
+@api_view(["GET", "POST"])
 def return_latest_location(request):
     robot_data = Robot.objects.all().count()
     index = 1
     data = {}
     while index <= robot_data:
-        data[
-            index
-        ] = f"{RobotLog.objects.filter(robot_id=index).values_list('timestamp', 'location_latitude', 'location_longitude').last()}"
+        temp = RobotLog.objects.filter(robot_id=index).values("log_id").last()
+        last_log_id = temp
+        data[index] = Log.objects.filter(id=last_log_id["log_id"]).values(
+            "timestamp",
+            "location_latitude",
+            "location_longitude",
+        )
+        print(data[index])
         index += 1
-    return JsonResponse(data)
+    return Response(data)
 
 
+@api_view(["GET", "POST"])
 def update_robot(request):
     if request.method == "POST":
         serial = request.POST["serial_number"]
@@ -136,5 +156,4 @@ def update_robot(request):
         return HttpResponseRedirect("/app1/return_all/")
     else:
         template = loader.get_template("modify_robot.html")
-
     return HttpResponse(template.render({}, request))
