@@ -1,6 +1,5 @@
 from django.urls import path
 
-
 from app1.views import (
     return_all_robots,
     return_robot_data,
@@ -11,9 +10,8 @@ from app1.views import (
     update_robot,
 )
 
-
 urlpatterns = [
-    path("return_all/", return_all_robots, name="ReturnAllRobots"),
+    path("return_all/", return_all_robots, name="Return_all_robots"),
     path("return_robot_data/", return_robot_data, name="ReturnRobotData"),
     path("add_new/", add_new_robot, name="AddNewRobot"),
     path("return_telemetry/", return_telemetry, name="ReturnTelemetry"),

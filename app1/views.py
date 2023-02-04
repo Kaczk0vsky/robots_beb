@@ -3,7 +3,10 @@ from django.template import loader
 from django.shortcuts import render
 from django.db import connection
 from django.contrib.auth.models import User, Group
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, authentication
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
 from app1.serializers import UserSerializer, GroupSerializer
 from app1.forms import NewRobot
@@ -30,6 +33,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
+@api_view(["GET"])
 def return_all_robots(request):
     robot_data = Robot.objects.all().count()
     index = 1
@@ -41,9 +45,10 @@ def return_all_robots(request):
             .get()
         )
         index += 1
-    return JsonResponse(data)
+    return Response(data)
 
 
+@api_view(["GET"])
 def return_robot_data(request):
     robot_data = Robot.objects.all().count()
     index = 1
@@ -53,7 +58,7 @@ def return_robot_data(request):
             index
         ] = f"{Robot.objects.filter(pk=index).values_list('serial_number', 'production_date', 'type', 'company').get()}, {RobotLog.objects.filter(robot_id=index).values_list('robot_id', 'timestamp', 'telemetry_humidity', 'telemetry_temperature', 'telemetry_pressure', 'location_latitude', 'location_longitude').last()}"
         index += 1
-    return JsonResponse(data)
+    return Response(data)
 
 
 def add_new_robot(request):
