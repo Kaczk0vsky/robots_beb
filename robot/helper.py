@@ -10,7 +10,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task1_beb.settings")
 django.setup()
 
 from robot.settings_reader import robot_info, robot_sensors
-from app1.models import Robot, RobotLog
+from app1.models import Robot, RobotLog, Log
 from task1_beb.celery import save_robot_data
 
 
@@ -55,17 +55,6 @@ def update_data():
     latitude = robot_location["latitude"].encode(encoding="UTF-8").hex()
     robot_location["longitude"] = str(random.randint(0, 90))
     longitude = robot_location["longitude"].encode(encoding="UTF-8").hex()
-
-    # saving latest robot data
-    # RobotLog.objects.filter(robot_id=robot["serial_number"]).update_or_create(
-    #     robot_id=robot["serial_number"],
-    #     timestamp=robot_timestamp["timestamp"],
-    #     telemetry_humidity=robot_telemetry["humidity"],
-    #     telemetry_temperature=robot_telemetry["temperature"],
-    #     telemetry_pressure=robot_telemetry["pressure"],
-    #     location_latitude=robot_location["latitude"],
-    #     location_longitude=robot_location["longitude"],
-    # )
 
     # update sensor data dict
     robot = robot_sensors()
