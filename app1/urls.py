@@ -1,4 +1,6 @@
 from django.urls import path
+
+
 from app1.views import (
     return_all_robots,
     return_robot_data,
