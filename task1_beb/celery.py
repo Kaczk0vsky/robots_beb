@@ -23,12 +23,12 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 
-@shared_task
-def mqtt_send(robot_serial, robot_topic, robot_data):
-    client.publish(
-        f"Robot serial: {robot_serial}/{robot_topic}",
-        robot_data,
-    )
+# @shared_task
+# def mqtt_send(robot_serial, robot_topic, robot_data):
+#     client.publish(
+#         f"robot serial-{robot_serial}/{robot_topic}",
+#         robot_data,
+#     )
 
 
 @shared_task
