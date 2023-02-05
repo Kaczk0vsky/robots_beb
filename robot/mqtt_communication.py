@@ -18,7 +18,7 @@ from robot.helper import (
 logger = logging.getLogger(__name__)
 mqqt_config = mqtt_settings()
 robot_data = robot_info()
-client = mqtt.Client()
+client = mqtt.Client(transport="websockets")
 name = make_robot_info()
 
 

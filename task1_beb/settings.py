@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "app1.apps.App1Config",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -73,6 +74,18 @@ TEMPLATES = [
         },
     },
 ]
+
+# Daphne
+ASGI_APPLICATION = "task1_beb.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("0.0.0.8000", 6379)],
+        },
+    },
+}
 
 WSGI_APPLICATION = "task1_beb.wsgi.application"
 

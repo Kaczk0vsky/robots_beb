@@ -6,3 +6,7 @@ dump-env>=1.4.0
 celery>=5.2.7
 redis>=4.4.2
 djangorestframework>=3.14.0
+channels>=4.0.0
+daphne>=4.0.0
+channels_redis>=4.0.0
+ndg-httpsclient>=0.5.1
