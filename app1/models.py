@@ -1,8 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
-
-# class for robot instance
+# robot class
 class Robot(models.Model):
     # creating choices for field
     FOUR_WHEELER = "4 wheeler"
@@ -32,35 +31,48 @@ class Robot(models.Model):
         return self.serial_number
 
 
-# class for robot instance
-class Log(models.Model):
+# sensor class - one robot can have many sensors
+class Sensor(models.Model):
+    # unique id for each sensor
+    id = models.IntegerField(primary_key=True, unique=True, editable=False)
+    # creating choices for field
+    TELEMETRY = "telemetry"
+    LOCATION = "location"
+    SENSOR_TYPES_CHOICES = [
+        (TELEMETRY, ("telemetry")),
+        (LOCATION, ("location")),
+    ]
+    # sensor types created from SENSOR_TYPE_CHOICES
+    type = models.CharField(
+        max_length=10,
+        choices=SENSOR_TYPES_CHOICES,
+        default="telemetry",
+    )
+    # robot to which sensor is attached
+    robot_id = models.ForeignKey(Robot, on_delete=models.CASCADE, editable=False)
+
+    def __str__(self):
+        return f"Sensor - [{self.type}] in robot {self.robot_id}"
+
+
+# log from sensors - one sensor can hava many logs
+class SensorLog(models.Model):
     # unique id
     id = models.IntegerField(editable=False, primary_key=True, unique=True)
+    # sensor id
+    sensor_id = models.ForeignKey(Sensor, on_delete=models.CASCADE, editable=False)
     # robot telemetry timestamp param
     timestamp = models.DateTimeField(default=timezone.now, editable=False)
     # robot humidity param
-    telemetry_humidity = models.IntegerField(default=0, editable=False)
+    telemetry_humidity = models.IntegerField(default=0, editable=False, blank=True)
     # robot temperature param
-    telemetry_temperature = models.IntegerField(default=0, editable=False)
+    telemetry_temperature = models.IntegerField(default=0, editable=False, blank=True)
     # robot pressure param
-    telemetry_pressure = models.IntegerField(default=0, editable=False)
+    telemetry_pressure = models.IntegerField(default=0, editable=False, blank=True)
     # robot location latitude param
-    location_latitude = models.IntegerField(default=0, editable=False)
+    location_latitude = models.IntegerField(default=0, editable=False, blank=True)
     # robot location logitude param
-    location_longitude = models.IntegerField(default=0, editable=False)
+    location_longitude = models.IntegerField(default=0, editable=False, blank=True)
 
     def __str__(self):
         return f"Log [{self.id}] on {self.timestamp}"
-
-
-# relation one to many between robot class and log class
-class RobotLog(models.Model):
-    # unique id for each log
-    id = models.IntegerField(primary_key=True, unique=True, editable=False)
-    # getting robot class
-    robot_id = models.ForeignKey(Robot, on_delete=models.CASCADE, editable=False)
-    # getting log class
-    log_id = models.ForeignKey(Log, on_delete=models.CASCADE, editable=False)
-
-    def __str__(self):
-        return f"Robot [{self.robot_id}] : [{self.log_id}]"

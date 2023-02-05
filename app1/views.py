@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 from app1.serializers import UserSerializer, GroupSerializer
-from app1.models import Robot, RobotLog, Log
+from app1.models import Robot, SensorLog, Sensor
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -163,3 +163,11 @@ def update_robot(request):
     else:
         template = loader.get_template("modify_robot.html")
     return HttpResponse(template.render({}, request))
+
+
+@api_view(["GET"])
+def detach_communication(request):
+    if request.method == "POST":
+        pass
+        msg = f"Detached robot"
+        return Response(msg)
