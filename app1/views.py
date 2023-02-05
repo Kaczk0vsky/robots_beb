@@ -9,7 +9,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 from app1.serializers import UserSerializer, GroupSerializer
-from app1.forms import NewRobot
 from app1.models import Robot, RobotLog, Log
 
 
@@ -65,12 +64,19 @@ def return_robot_data(request):
 @api_view(["GET", "POST"])
 def add_new_robot(request):
     if request.method == "POST":
-        form = NewRobot(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect("/app1/return_all/")
+        serial_number = request.POST.get("serial_number")
+        production_date = request.POST.get("production_date")
+        type = request.POST.get("type")
+        company = request.POST.get("company")
+        Robot(
+            serial_number=serial_number,
+            production_date=production_date,
+            type=type,
+            company=company,
+        ).save()
+        return HttpResponseRedirect("/app1/return_all/")
     else:
-        form = NewRobot()
+        form = Robot()
     return render(request, "add_new.html")
 
 
