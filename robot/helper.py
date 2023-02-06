@@ -108,7 +108,9 @@ def add_robot():
         ).save()
 
     # adding one telemetry sensor and one location sensor
-    if Sensor.objects.filter(type="telemetry").exists():
+    if Sensor.objects.filter(
+        type="telemetry", robot_id=Robot.objects.get(pk=robot["serial_number"])
+    ).exists():
         pass
     else:
         Sensor(
@@ -116,7 +118,9 @@ def add_robot():
             robot_id=Robot.objects.get(pk=robot["serial_number"]),
             fault_detected=False,
         ).save()
-    if Sensor.objects.filter(type="location").exists():
+    if Sensor.objects.filter(
+        type="location", robot_id=Robot.objects.get(pk=robot["serial_number"])
+    ).exists():
         pass
     else:
         Sensor(
@@ -200,6 +204,7 @@ def get_fault_log(sensor_id):
         .values("fault_detected")
         .get()
     )
+    # TODO: correct the field id=sensor_id - it doesnt work cuz it take wrong indexes
 
     if fault_log["fault_detected"] == True:
         return_info = "fault detected"

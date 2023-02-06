@@ -88,23 +88,19 @@ def return_telemetry(request):
         fromdate = request.POST.get("fromdate")
         todate = request.POST.get("todate")
         serial = request.POST.get("serial_number")
-        data = RobotLog.objects.filter(robot_id=serial).values("log_id")
+        data = SensorLog.objects.filter(
+            sensor_id=Sensor.objects.get(
+                type="telemetry", robot_id=Robot.objects.get(pk=serial)
+            ),
+            timestamp__range=[fromdate, todate],
+        ).values(
+            "timestamp",
+            "telemetry_humidity",
+            "telemetry_temperature",
+            "telemetry_pressure",
+        )
 
-        dict = {}
-        index = 0
-        for x in data:
-            log_ids = Log.objects.filter(
-                timestamp__range=[fromdate, todate],
-                id=x["log_id"],
-            ).values(
-                "timestamp",
-                "telemetry_humidity",
-                "telemetry_temperature",
-                "telemetry_pressure",
-            )
-            dict[index + 1] = log_ids
-            index += 1
-        return Response(dict)
+        return Response(data)
     else:
         return HttpResponse(template.render({}, request))
 
@@ -116,22 +112,17 @@ def return_location(request):
         fromdate = request.POST.get("fromdate")
         todate = request.POST.get("todate")
         serial = request.POST.get("serial_number")
-        data = RobotLog.objects.filter(robot_id=serial).values("log_id")
-
-        dict = {}
-        index = 0
-        for x in data:
-            log_ids = Log.objects.filter(
-                timestamp__range=[fromdate, todate],
-                id=x["log_id"],
-            ).values(
-                "timestamp",
-                "location_latitude",
-                "location_longitude",
-            )
-            dict[index + 1] = log_ids
-            index += 1
-        return Response(dict)
+        data = SensorLog.objects.filter(
+            sensor_id=Sensor.objects.get(
+                type="location", robot_id=Robot.objects.get(pk=serial)
+            ),
+            timestamp__range=[fromdate, todate],
+        ).values(
+            "timestamp",
+            "location_latitude",
+            "location_longitude",
+        )
+        return Response(data)
     else:
         return HttpResponse(template.render({}, request))
 
@@ -139,18 +130,18 @@ def return_location(request):
 @api_view(["GET", "POST"])
 def return_latest_location(request):
     robot_data = Robot.objects.all().count()
-    index = 1
+    # index = 1
     data = {}
-    while index <= robot_data:
-        temp = RobotLog.objects.filter(robot_id=index).values("log_id").last()
-        last_log_id = temp
-        data[index] = Log.objects.filter(id=last_log_id["log_id"]).values(
-            "timestamp",
-            "location_latitude",
-            "location_longitude",
-        )
-        print(data[index])
-        index += 1
+    # while index <= robot_data:
+    #     temp = RobotLog.objects.filter(robot_id=index).values("log_id").last()
+    #     last_log_id = temp
+    #     data[index] = Log.objects.filter(id=last_log_id["log_id"]).values(
+    #         "timestamp",
+    #         "location_latitude",
+    #         "location_longitude",
+    #     )
+    #     print(data[index])
+    #     index += 1
     return Response(data)
 
 
