@@ -7,8 +7,7 @@ from paho.mqtt import client as mqtt
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task1_beb.settings")
 django.setup()
 
-from app1.models import SensorLog, Sensor, Robot
-from robot.settings_reader import robot_info
+from app1.models import SensorLog
 
 app = Celery("task1_beb")
 client = mqtt.Client()
@@ -32,14 +31,19 @@ app.autodiscover_tasks()
 
 
 @shared_task
-def save_robot_data(timestamp, humidity, temperature, pressure, latitude, longitude):
-    robot = robot_info()
-
-    SensorLog(
-        timestamp=timestamp,
-        telemetry_humidity=humidity,
-        telemetry_temperature=temperature,
-        telemetry_pressure=pressure,
-        location_latitude=latitude,
-        location_longitude=longitude,
-    ).save()
+def save_robot_data(timestamp, data1, data2, data3, type, sensor_id):
+    if type == "telemetry":
+        SensorLog(
+            sensor_id=sensor_id,
+            timestamp=timestamp,
+            telemetry_humidity=data1,
+            telemetry_temperature=data2,
+            telemetry_pressure=data3,
+        ).save()
+    elif type == "location":
+        SensorLog(
+            sensor_id=sensor_id,
+            timestamp=timestamp,
+            location_latitude=data1,
+            locatioon_longitude=data2,
+        ).save()

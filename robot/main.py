@@ -5,15 +5,12 @@ import threading
 sys.path.append("..")
 
 from robot.mqtt_communication import MqttComunication, TimeMessure
-from robot.helper import add_robot, create_sensors
+from robot.helper import add_robot
 
 
 def initialization():
     # Add new robot
     add_robot()
-
-    # Add sensors
-    create_sensors()
 
     # Initializing Logger console info
     logger = logging.getLogger(__name__)

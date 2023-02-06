@@ -126,5 +126,5 @@ class TimeMessure:
         while True:
             if self.interval_time <= time_in_seconds(datetime.now() - self.start_time):
                 update_data()
-                self.mqtt.send_data()
+                # self.mqtt.send_data()
                 self.start_time = datetime.now()

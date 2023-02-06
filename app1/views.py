@@ -55,7 +55,8 @@ def return_robot_data(request):
     while index <= robot_data:
         data[index] = (
             f"{Robot.objects.filter(serial_number=index).values_list('production_date', 'type', 'company').get()}"
-            + f"{Log.objects.filter(id=index).values_list('timestamp', 'telemetry_humidity', 'telemetry_temperature', 'telemetry_pressure', 'location_latitude', 'location_longitude').last()}"
+            + f"{SensorLog.objects.filter(sensor_id=Sensor.objects.get(type='telemetry')).last()}"
+            + f"{SensorLog.objects.filter(sensor_id=Sensor.objects.get(type='location')).last()}"
         )
         index += 1
     return Response(data)
