@@ -6,4 +6,4 @@ company = 'LG'
 
 [mqtt]
 topic = 'task1_beb'
-interval_time = '5'
+interval_time = '10'

@@ -11,8 +11,8 @@ from robot.helper import (
     time_in_seconds,
     update_data,
     make_robot_info,
+    get_fault_log,
     mqtt_topics,
-    sensors_data,
 )
 
 logger = logging.getLogger(__name__)
@@ -69,47 +69,74 @@ class MqttComunication:
         while rc != 0:
             client.connect(mqqt_config["host"], int(mqqt_config["port"]))
 
-    def send_data(self):
+    def send_data(self, sensors_data):
         logger.info(
             make_robot_info()
             + f"Sent robot parameters on topic - robot serial-{robot_data['serial_number']}."
         )
-        for x in mqtt_topics:
-            if "telemetry" in mqtt_topics[x]:
+        index = 1
+        i = 1
+        while i <= len(mqtt_topics):
+            if "telemetry" in mqtt_topics[i] and i <= (len(mqtt_topics) / 2):
+                temp_dict = sensors_data[f"SNR{i}"]
+                timestamp = str(temp_dict["timestamp"]).encode(encoding="UTF-8").hex()
+                humidity = (
+                    str(temp_dict["telemetry_humidity"]).encode(encoding="UTF-8").hex()
+                )
+                temperature = (
+                    str(temp_dict["telemetry_temperature"])
+                    .encode(encoding="UTF-8")
+                    .hex()
+                )
+                pressure = (
+                    str(temp_dict["telemetry_pressure"]).encode(encoding="UTF-8").hex()
+                )
                 temp = {
-                    "timestamp": sensors_data["timestamp"],
-                    "humidity": sensors_data["humidity"],
-                    "temperature": sensors_data["temperature"],
-                    "pressure": sensors_data["pressure"],
+                    "timestamp": timestamp,
+                    "humidity": humidity,
+                    "temperature": temperature,
+                    "pressure": pressure,
                 }
                 # mqtt_send.delay(
                 #     robot_data["serial_number"], mqtt_topics[x], json.dumps(temp)
                 # )
                 client.publish(
-                    f'Robot serial: {robot_data["serial_number"]}/{mqtt_topics[x]}',
+                    f'Robot serial: {robot_data["serial_number"]}/{mqtt_topics[i]}',
                     json.dumps(temp),
                 )
-            elif "location" in mqtt_topics[x]:
+            elif "location" in mqtt_topics[i] and i <= (len(mqtt_topics) / 2):
+                temp_dict = sensors_data[f"SNR{i}"]
+                timestamp = str(temp_dict["timestamp"]).encode(encoding="UTF-8").hex()
+                latitude = (
+                    str(temp_dict["location_latitude"]).encode(encoding="UTF-8").hex()
+                )
+                longitude = (
+                    str(temp_dict["location_longitude"]).encode(encoding="UTF-8").hex()
+                )
                 temp = {
-                    "timestamp": sensors_data["timestamp"],
-                    "latitude": sensors_data["latitude"],
-                    "longitude": sensors_data["longitude"],
+                    "timestamp": timestamp,
+                    "latitude": latitude,
+                    "longitude": longitude,
                 }
                 # mqtt_send.delay(
                 #     robot_data["serial_number"], mqtt_topics[x], json.dumps(temp)
                 # )
                 client.publish(
-                    f'Robot serial: {robot_data["serial_number"]}/{mqtt_topics[x]}',
+                    f'Robot serial: {robot_data["serial_number"]}/{mqtt_topics[i]}',
                     json.dumps(temp),
                 )
             else:
+                # getting fault info
+                fault_log = get_fault_log(index)
                 # mqtt_send.delay(
                 #     robot_data["serial_number"], mqtt_topics[x], json.dumps(temp)
                 # )
                 client.publish(
-                    f'Robot serial: {robot_data["serial_number"]}/{mqtt_topics[x]}',
-                    json.dumps(sensors_data["fault_log"]),
+                    f'Robot serial: {robot_data["serial_number"]}/{mqtt_topics[i]}',
+                    json.dumps(fault_log),
                 )
+                index += 1
+            i += 1
 
     def mqtt_loop_forever(self):
         client.loop_forever()
@@ -125,6 +152,6 @@ class TimeMessure:
     def loop_forever(self):
         while True:
             if self.interval_time <= time_in_seconds(datetime.now() - self.start_time):
-                update_data()
-                # self.mqtt.send_data()
+                sensors_data = update_data()
+                self.mqtt.send_data(sensors_data)
                 self.start_time = datetime.now()

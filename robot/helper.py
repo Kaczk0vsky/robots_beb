@@ -30,7 +30,6 @@ robot_timestamp = {
     "timestamp": timezone.now(),
 }
 
-sensors_data = {}
 mqtt_topics = {}
 
 
@@ -60,22 +59,25 @@ def update_data():
             robot_telemetry["humidity"] = str(random.randint(0, 100))
             robot_telemetry["temperature"] = str(random.randint(-10, 40))
             robot_telemetry["pressure"] = str(random.randint(970, 1030))
-            SensorLog(
-                sensor_id=Sensor.objects.get(id=temp["id"]),
-                timestamp=robot_timestamp["timestamp"],
-                telemetry_humidity=robot_telemetry["humidity"],
-                telemetry_temperature=robot_telemetry["temperature"],
-                telemetry_pressure=robot_telemetry["pressure"],
-            ).save()
+            save_robot_data.delay(
+                robot_timestamp["timestamp"],
+                robot_telemetry["humidity"],
+                robot_telemetry["temperature"],
+                robot_telemetry["pressure"],
+                "telemetry",
+                temp["id"],
+            )
         elif Sensor.objects.filter(id=temp["id"], type="location"):
             robot_location["latitude"] = str(random.randint(0, 90))
             robot_location["longitude"] = str(random.randint(0, 90))
-            SensorLog(
-                sensor_id=Sensor.objects.get(id=temp["id"]),
-                timestamp=robot_timestamp["timestamp"],
-                location_longitude=robot_location["longitude"],
-                location_latitude=robot_location["latitude"],
-            ).save()
+            save_robot_data.delay(
+                robot_timestamp["timestamp"],
+                robot_location["latitude"],
+                robot_location["longitude"],
+                0,
+                "location",
+                temp["id"],
+            )
 
     # creating mqtt topics
     create_mqtt_topics()
@@ -83,28 +85,8 @@ def update_data():
     # creating mqtt data
     sensors_data = create_mqtt_data()
 
-    # # update sensor data dict
-    # save_robot_data.delay(
-    #     robot_timestamp["timestamp"],
-    #     robot_telemetry["humidity"],
-    #     robot_telemetry["temperature"],
-    #     robot_telemetry["pressure"],
-    #     robot_location["latitude"],
-    #     robot_location["longitude"],
-    # )
-
-    # robot["telemetry"] = int(robot["telemetry"])
-    # robot["location"] = int(robot["location"])
-    # number_of_sensors = robot["telemetry"] + robot["location"]
-    # index = 1
-    # while index <= number_of_sensors:
-    #     x = index + number_of_sensors
-    #     if index < 10:
-    #         sensors_data[f"SNR0{index}"] = data_dict
-    #     else:
-    #         sensors_data[f"SNR{index}"] = data_dict
-    #     index += 1
-    #     sensors_data.update(data_dict)
+    # returning data dict for mqtt
+    return sensors_data
 
 
 def make_robot_info():
@@ -166,16 +148,8 @@ def create_mqtt_topics():
         index += 1
 
 
-# TODO: Hexadecimal format
-#
-# timestamp = robot_timestamp["timestamp"].encode(encoding="UTF-8").hex()
-# humidity = robot_telemetry["humidity"].encode(encoding="UTF-8").hex()
-# temperature = robot_telemetry["temperature"].encode(encoding="UTF-8").hex()
-# pressure = robot_telemetry["pressure"].encode(encoding="UTF-8").hex()
-# latitude = robot_location["latitude"].encode(encoding="UTF-8").hex()
-# longitude = robot_location["longitude"].encode(encoding="UTF-8").hex()
-#
 def create_mqtt_data():
+    # getting mqtt data to be send to topics
     robot = robot_info()
     sensors_data = {}
     sensors_id = Sensor.objects.filter(robot_id=robot["serial_number"]).values("id")
@@ -212,3 +186,24 @@ def create_mqtt_data():
         index += 1
 
     return sensors_data
+
+
+def get_fault_log(sensor_id):
+    # getting fault log status of each sensor for robot specified in settings.toml
+    robot = robot_info()
+
+    fault_log = (
+        Sensor.objects.filter(
+            robot_id=Robot.objects.get(pk=robot["serial_number"]),
+            id=sensor_id,
+        )
+        .values("fault_detected")
+        .get()
+    )
+
+    if fault_log["fault_detected"] == True:
+        return_info = "fault detected"
+    else:
+        return_info = "fault recovered"
+
+    return return_info
