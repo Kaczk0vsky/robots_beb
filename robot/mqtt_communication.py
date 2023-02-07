@@ -74,7 +74,9 @@ class MqttComunication:
             make_robot_info()
             + f"Sent robot parameters on topic - robot serial-{robot_data['serial_number']}."
         )
-        index = 1
+        # getting fault info
+        fault_log = get_fault_log()
+        index = 0
         i = 1
         while i <= len(mqtt_topics):
             if "telemetry" in mqtt_topics[i] and i <= (len(mqtt_topics) / 2):
@@ -126,16 +128,14 @@ class MqttComunication:
                     json.dumps(temp),
                 )
             else:
-                # getting fault info
-                fault_log = get_fault_log(index)
                 # mqtt_send.delay(
                 #     robot_data["serial_number"], mqtt_topics[x], json.dumps(temp)
                 # )
                 client.publish(
                     f'Robot serial: {robot_data["serial_number"]}/{mqtt_topics[i]}',
-                    json.dumps(fault_log),
+                    json.dumps(fault_log[index]),
                 )
-                index += 1
+                index = +1
             i += 1
 
     def mqtt_loop_forever(self):

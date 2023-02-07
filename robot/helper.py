@@ -48,11 +48,12 @@ def update_data():
         # checking for fault of sensors in robot
         temp = x
         random_fault = random.randint(0, 100)
-        if random_fault >= 40 and random_fault <= 60:
+        if random_fault >= 20 and random_fault <= 70:
             fault_log = True
         else:
             fault_log = False
-        Sensor.objects.filter(robot_id=temp["id"]).update(fault_detected=fault_log)
+        Sensor.objects.filter(id=temp["id"]).update(fault_detected=fault_log)
+
         # getting data read from sensors
         robot_timestamp["timestamp"] = str(timezone.now())
         if Sensor.objects.filter(id=temp["id"], type="telemetry"):
@@ -192,23 +193,19 @@ def create_mqtt_data():
     return sensors_data
 
 
-def get_fault_log(sensor_id):
+def get_fault_log():
     # getting fault log status of each sensor for robot specified in settings.toml
     robot = robot_info()
 
-    fault_log = (
-        Sensor.objects.filter(
-            robot_id=Robot.objects.get(pk=robot["serial_number"]),
-            id=sensor_id,
-        )
-        .values("fault_detected")
-        .get()
-    )
-    # TODO: correct the field id=sensor_id - it doesnt work cuz it take wrong indexes
+    fault_log = Sensor.objects.filter(
+        robot_id=Robot.objects.get(pk=robot["serial_number"]),
+    ).values("fault_detected")
+    fault_list = list()
 
-    if fault_log["fault_detected"] == True:
-        return_info = "fault detected"
-    else:
-        return_info = "fault recovered"
+    for x in fault_log:
+        if x["fault_detected"] == False:
+            fault_list.append("fault_recovered")
+        elif x["fault_detected"] == True:
+            fault_list.append("fault_detected")
 
-    return return_info
+    return fault_log

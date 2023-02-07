@@ -1,8 +1,8 @@
 [robot_info]
-serial_number = '2'
-production_date = '2023-01-29'
-type = 'tracked'
-company = 'BEB'
+serial_number = '3'
+production_date = '2023-02-07'
+type = 'amphibian'
+company = 'EcoTruck'
 
 [mqtt]
 topic = 'task1_beb'
