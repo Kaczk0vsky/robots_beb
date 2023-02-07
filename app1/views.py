@@ -127,21 +127,29 @@ def return_location(request):
         return HttpResponse(template.render({}, request))
 
 
-@api_view(["GET", "POST"])
+@api_view(["GET"])
 def return_latest_location(request):
-    robot_data = Robot.objects.all().count()
-    # index = 1
+    number_of_robots = Robot.objects.count()
+    index = 1
     data = {}
-    # while index <= robot_data:
-    #     temp = RobotLog.objects.filter(robot_id=index).values("log_id").last()
-    #     last_log_id = temp
-    #     data[index] = Log.objects.filter(id=last_log_id["log_id"]).values(
-    #         "timestamp",
-    #         "location_latitude",
-    #         "location_longitude",
-    #     )
-    #     print(data[index])
-    #     index += 1
+    while index <= number_of_robots:
+        temp = {
+            index: (
+                SensorLog.objects.filter(
+                    sensor_id=Sensor.objects.get(
+                        type="location", robot_id=Robot.objects.get(pk=index)
+                    ),
+                )
+                .values(
+                    "timestamp",
+                    "location_latitude",
+                    "location_longitude",
+                )
+                .last()
+            )
+        }
+        data.update(temp)
+        index += 1
     return Response(data)
 
 
