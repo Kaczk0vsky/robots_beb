@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <center>
+        <form method="POST">
+            {% csrf_token %}
+            <hr />
+            <p>Detach specified communication device from specified robot:</p>
+            <table border='1'>
+                <td>
+                    <p>Device type:</p>
+                </td>
+                <td>
+                    <input type="checkbox" name="telemetry_1" value="True">
+                    <label for="telemetry">telemetry</label><br>
+                    <input type="checkbox" name="location_1" value="True">
+                    <label for="telemetry">location</label><br>
+                </td>
+                <tr>
+                    <td>
+                        <p>Robot serial number:</p>
+                    </td>
+                    <td>
+                        <input type="text" name="serial_1" />
+                    </td>
+                </tr>
+            </table>
+            <input type="submit" value="Detach communication" name="detach">
+            <hr />
+
+            <p>Attach specified communication device to specified robot:</p>
+            <table border='1'>
+                <td>
+                    <p>Device type:</p>
+                </td>
+                <td>
+                    <input type="checkbox" name="telemetry_2" value="True">
+                    <label for="telemetry">telemetry</label><br>
+                    <input type="checkbox" name="location_2" value="True">
+                    <label for="telemetry">location</label><br>
+                </td>
+                <tr>
+                    <td>
+                        <p>Robot serial number:</p>
+                    </td>
+                    <td>
+                        <input type="text" name="serial_2" />
+                    </td>
+                </tr>
+            </table>
+            <input type="submit" value="Attach communication" name="attach">
+            <hr />
+
+            <p>Detach specified communication device from one robot and attach to another:</p>
+            <table border='1'>
+                <td>
+                    <p>Device type:</p>
+                </td>
+                <td>
+                    <input type="checkbox" name="telemetry_3" value="True">
+                    <label for="telemetry">telemetry</label><br>
+                    <input type="checkbox" name="location_3" value="True">
+                    <label for="telemetry">location</label><br>
+                </td>
+                <tr>
+                    <td>
+                        <p>Detach from:</p>
+                    </td>
+                    <td>
+                        <input type="text" name="serial_3" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p>Attach to:</p>
+                    </td>
+                    <td>
+                        <input type="text" name="serial_4" />
+                    </td>
+                </tr>
+            </table>
+            <input type="submit" value="Move communication device" name="swap">
+            <hr />
+        </form>
+    </center>
+</body>
+
+</html>

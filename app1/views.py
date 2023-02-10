@@ -1,4 +1,9 @@
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import (
+    HttpResponse,
+    HttpResponseRedirect,
+    JsonResponse,
+    HttpResponseNotFound,
+)
 from django.template import loader
 from django.shortcuts import render
 from django.db import connection
@@ -156,8 +161,8 @@ def return_latest_location(request):
 @api_view(["GET", "POST"])
 def update_robot(request):
     if request.method == "POST":
-        serial = request.POST["serial_number"]
-        type = request.POST["type"]
+        serial = request.POST.get("serial_number")
+        type = request.POST.get("type")
         Robot.objects.filter(pk=serial).update(type=type)
         return HttpResponseRedirect("/app1/return_all/")
     else:
@@ -165,9 +170,76 @@ def update_robot(request):
     return HttpResponse(template.render({}, request))
 
 
-@api_view(["GET"])
-def detach_communication(request):
-    if request.method == "POST":
-        pass
-        msg = f"Detached robot"
-        return Response(msg)
+@api_view(["GET", "POST"])
+def configure_communication(request):
+    template = loader.get_template("communication.html")
+    if request.method == "POST" and "detach" in request.POST:
+        telemetry_state = request.POST.get("telemetry_1")
+        location_state = request.POST.get("location_1")
+        robot_serial = request.POST.get("serial_1")
+        type = ""
+
+        if telemetry_state == "True":
+            type = "telemetry"
+        elif location_state == "True":
+            type = "location"
+
+        if type == "" or robot_serial == "":
+            data = "Correct data input!"
+            return Response(data)
+        else:
+            Sensor.objects.filter(
+                robot_id=Robot.objects.get(serial_number=robot_serial),
+                type=type,
+            ).delete()
+            data = Sensor.objects.all().values()
+            return Response(data)
+
+    elif request.method == "POST" and "attach" in request.POST:
+        telemetry_state = request.POST.get("telemetry_2")
+        location_state = request.POST.get("location_2")
+        robot_serial = request.POST.get("serial_2")
+        type = ""
+
+        if telemetry_state == "True":
+            type = "telemetry"
+        elif location_state == "True":
+            type = "location"
+
+        if type == "" or robot_serial == "":
+            data = "Correct data input!"
+            return Response(data)
+        else:
+            Sensor(
+                robot_id=Robot.objects.get(serial_number=robot_serial),
+                type=type,
+                fault_detected=False,
+            ).save()
+            data = Sensor.objects.all().values()
+            return Response(data)
+
+    elif request.method == "POST" and "swap" in request.POST:
+        telemetry_state = request.POST.get("telemetry_3")
+        location_state = request.POST.get("location_3")
+        detach = request.POST.get("serial_3")
+        attach = request.POST.get("serial_4")
+        type = ""
+
+        if telemetry_state == "True":
+            type = "telemetry"
+        elif location_state == "True":
+            type = "location"
+
+        if type == "" or detach == "" or attach == "":
+            data = "Correct data input!"
+            return Response(data)
+        else:
+            Sensor.objects.filter(
+                robot_id=Robot.objects.get(serial_number=detach),
+                type=type,
+            ).update(robot_id=Robot.objects.get(serial_number=attach))
+        data = Sensor.objects.all().values()
+        return Response(data)
+
+    else:
+        return HttpResponse(template.render({}, request))

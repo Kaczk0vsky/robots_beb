@@ -208,4 +208,4 @@ def get_fault_log():
         elif x["fault_detected"] == True:
             fault_list.append("fault_detected")
 
-    return fault_log
+    return fault_list
