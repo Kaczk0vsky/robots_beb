@@ -6,6 +6,21 @@
         <form method="POST">
             {% csrf_token %}
             <hr />
+            <p>Create communication device:</p>
+            <table border='1'>
+                <td>
+                    <p>Device type:</p>
+                </td>
+                <td>
+                    <input type="checkbox" name="type_telemetry" value="True">
+                    <label for="telemetry">telemetry</label><br>
+                    <input type="checkbox" name="type_location" value="True">
+                    <label for="telemetry">location</label><br>
+                </td>
+            </table>
+            <input type="submit" value="Create" name="create_device">
+            <hr />
+
             <p>Detach specified communication device from specified robot:</p>
             <table border='1'>
                 <td>

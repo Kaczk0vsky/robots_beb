@@ -168,6 +168,8 @@ def update_robot(request):
 @api_view(["GET", "POST"])
 def configure_communication(request):
     template = loader.get_template("communication.html")
+
+    # detaching communication device from robot
     if request.method == "POST" and "detach" in request.POST:
         telemetry_state = request.POST.get("telemetry_1")
         location_state = request.POST.get("location_1")
@@ -179,17 +181,25 @@ def configure_communication(request):
         elif location_state == "True":
             type = "location"
 
-        if type == "" or robot_serial == "":
+        if (
+            type == ""
+            or robot_serial == ""
+            or telemetry_state == "True"
+            and location_state == "True"
+            or telemetry_state == "False"
+            and location_state == "False"
+        ):
             data = "Correct data input!"
             return Response(data)
         else:
             Sensor.objects.filter(
                 robot_id=Robot.objects.get(serial_number=robot_serial),
                 type=type,
-            ).delete()
+            ).update(robot_id=None)
             data = Sensor.objects.all().values()
             return Response(data)
 
+    # attaching communication device to a robot
     elif request.method == "POST" and "attach" in request.POST:
         telemetry_state = request.POST.get("telemetry_2")
         location_state = request.POST.get("location_2")
@@ -201,7 +211,14 @@ def configure_communication(request):
         elif location_state == "True":
             type = "location"
 
-        if type == "" or robot_serial == "":
+        if (
+            type == ""
+            or robot_serial == ""
+            or telemetry_state == "True"
+            and location_state == "True"
+            or telemetry_state == "False"
+            and location_state == "False"
+        ):
             data = "Correct data input!"
             return Response(data)
         else:
@@ -213,6 +230,7 @@ def configure_communication(request):
             data = Sensor.objects.all().values()
             return Response(data)
 
+    # EP for removing communication device from one robot and adding it to another
     elif request.method == "POST" and "swap" in request.POST:
         telemetry_state = request.POST.get("telemetry_3")
         location_state = request.POST.get("location_3")
@@ -225,7 +243,15 @@ def configure_communication(request):
         elif location_state == "True":
             type = "location"
 
-        if type == "" or detach == "" or attach == "":
+        if (
+            type == ""
+            or detach == ""
+            or attach == ""
+            or telemetry_state == "True"
+            and location_state == "True"
+            or telemetry_state == "False"
+            and location_state == "False"
+        ):
             data = "Correct data input!"
             return Response(data)
         else:
@@ -236,6 +262,29 @@ def configure_communication(request):
         data = Sensor.objects.all().values()
         return Response(data)
 
+    # EP for creating communication device
+    elif request.method == "POST" and "create_device" in request.POST:
+        telemetry_state = request.POST.get("type_telemetry")
+        location_state = request.POST.get("type_location")
+        type = ""
+
+        if telemetry_state == "True":
+            type = "telemetry"
+        elif location_state == "True":
+            type = "location"
+
+        if (
+            type == ""
+            or telemetry_state == "True"
+            and location_state == "True"
+            or telemetry_state == "False"
+            and location_state == "False"
+        ):
+            data = "Correct data input!"
+        else:
+            Sensor(type=type).save()
+            data = Sensor.objects.all().values()
+        return Response(data)
     else:
         return HttpResponse(template.render({}, request))
 
@@ -292,11 +341,3 @@ def change_parameters(request):
         return HttpResponseRedirect("/return_all/")
     else:
         return HttpResponse(template.render(data, request))
-
-
-def create_device(request):
-    template = loader.get_template("communication.html")
-    if request.method == "POST" and "create_device" in request.POST:
-        pass
-    else:
-        return HttpResponse(template.render({}, request))

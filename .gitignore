@@ -6,3 +6,5 @@ db.sqlite3
 .env
 db.robots
 migrations/
+__pycache__/
+*.pyc

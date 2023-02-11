@@ -15,7 +15,11 @@ class Robot(models.Model):
         (FLYING, ("flying")),
     ]
     # unique robot serial number
-    serial_number = models.CharField(max_length=256, unique=True, primary_key=True)
+    serial_number = models.CharField(
+        max_length=256,
+        unique=True,
+        primary_key=True,
+    )
     # production date of a robot
     production_date = models.DateField()
     # robot type created from ROBOT_TYPE_CHOICES
@@ -51,8 +55,15 @@ class Sensor(models.Model):
     )
     # field for getting fault information
     fault_detected = models.BooleanField(editable=False, default=False)
-    # robot to which sensor is attached
-    robot_id = models.ForeignKey(Robot, on_delete=models.CASCADE, editable=False)
+    # robot to which sensor is attached, might be blank for creating an empty sensor device or detaching it from robot
+    robot_id = models.ForeignKey(
+        Robot,
+        on_delete=models.CASCADE,
+        editable=False,
+        null=True,
+        blank=True,
+        db_column="robot_id",
+    )
 
     def __str__(self):
         return f"Sensor - [{self.type}] in robot {self.robot_id}"
