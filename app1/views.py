@@ -143,7 +143,7 @@ def return_logs(request):
         serial = request.POST.get("serial")
         date_list = day.split("-")
 
-        x = SensorLog.objects.filter(
+        SensorLog.objects.filter(
             sensor_id=Sensor.objects.get(
                 type="location", robot_id=Robot.objects.get(pk=serial)
             ),
@@ -152,6 +152,27 @@ def return_logs(request):
             timestamp__day=date_list[2],
         ).delete()
         data = "Deleted logs from specified day!"
+        return Response(data)
+
+    # EP for setting temperature for specified robot/robots for the whole day
+    elif request.method == "POST" and "change" in request.POST:
+        serial = str(request.POST.get("serial"))
+        serial_list = serial.split("-")
+        day = str(request.POST.get("temp_day"))
+        date_list = day.split("-")
+        temperature = request.POST.get("temperature")
+        index = 0
+        while index <= len(serial_list) - 1:
+            SensorLog.objects.filter(
+                sensor_id=Sensor.objects.get(
+                    type="telemetry", robot_id=Robot.objects.get(pk=serial_list[index])
+                ),
+                timestamp__year=date_list[0],
+                timestamp__month=date_list[1],
+                timestamp__day=date_list[2],
+            ).update(telemetry_temperature=temperature)
+            index += 1
+        data = "Changed temperature logs!"
         return Response(data)
     else:
         return HttpResponse(template.render({}, request))
