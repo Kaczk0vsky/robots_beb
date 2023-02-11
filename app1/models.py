@@ -1,6 +1,17 @@
 from django.db import models
 from django.utils import timezone
 
+# company class
+class Company(models.Model):
+    # unique id for each company
+    id = models.IntegerField(primary_key=True, unique=True, editable=False)
+    # company name
+    company_name = models.CharField(max_length=256, unique=True)
+
+    def __str__(self):
+        return self.company_name
+
+
 # robot class
 class Robot(models.Model):
     # creating choices for field
@@ -29,7 +40,7 @@ class Robot(models.Model):
         default="4 wheeler",
     )
     # robot company which own it
-    company = models.CharField(max_length=256)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.serial_number

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Robot, Sensor, SensorLog, RobotModificationHistory
+from .models import Robot, Sensor, SensorLog, RobotModificationHistory, Company
 
 
 class RobotsAdmin(admin.ModelAdmin):
@@ -12,3 +12,4 @@ admin.site.register(Robot, RobotsAdmin)
 admin.site.register(Sensor)
 admin.site.register(SensorLog)
 admin.site.register(RobotModificationHistory)
+admin.site.register(Company)

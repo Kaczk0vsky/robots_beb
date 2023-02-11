@@ -10,7 +10,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task1_beb.settings")
 django.setup()
 
 from robot.settings_reader import robot_info
-from app1.models import Robot, Sensor, SensorLog
+from app1.models import Robot, Sensor, SensorLog, Company
 from task1_beb.celery import save_robot_data
 
 
@@ -98,6 +98,10 @@ def make_robot_info():
 def add_robot():
     # creating robot class
     robot = robot_info()
+    if Company.objects.filter(company_name=robot["company"]).exists():
+        pass
+    else:
+        Company(company_name=robot["company"]).save()
     if Robot.objects.filter(pk=robot["serial_number"]).exists():
         pass
     else:
@@ -105,7 +109,7 @@ def add_robot():
             serial_number=robot["serial_number"],
             production_date=robot["production_date"],
             type=robot["type"],
-            company=robot["company"],
+            company=Company.objects.get(company_name=robot["company"]),
         ).save()
 
     # adding one telemetry sensor and one location sensor

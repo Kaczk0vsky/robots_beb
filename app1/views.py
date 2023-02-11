@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 from app1.serializers import UserSerializer, GroupSerializer
-from app1.models import Robot, SensorLog, Sensor, RobotModificationHistory
+from app1.models import Robot, SensorLog, Sensor, RobotModificationHistory, Company
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -74,11 +74,15 @@ def add_new_robot(request):
         production_date = request.POST.get("production_date")
         type = request.POST.get("type")
         company = request.POST.get("company")
+        if Company.objects.filter(company_name=company).exists():
+            pass
+        else:
+            Company(company_name=company).save()
         Robot(
             serial_number=serial_number,
             production_date=production_date,
             type=type,
-            company=company,
+            company=Company.objects.get(company_name=company),
         ).save()
         return HttpResponseRedirect("/return_all/")
 
@@ -156,7 +160,7 @@ def return_logs(request):
 
     # EP for setting temperature for specified robot/robots for the whole day
     elif request.method == "POST" and "change" in request.POST:
-        serial = str(request.POST.get("serial"))
+        serial = str(request.POST.get("serial_temp"))
         serial_list = serial.split("-")
         day = str(request.POST.get("temp_day"))
         date_list = day.split("-")
@@ -372,7 +376,13 @@ def change_parameters(request):
                 robot_msg
                 + f"- company - from {Robot.objects.values_list('company', flat=True).get(serial_number=serial)} to {new_company} \n"
             )
-            Robot.objects.filter(serial_number=serial).update(company=new_company)
+            if Company.objects.filter(company_name=new_company).exists():
+                pass
+            else:
+                Company(company_name=new_company).save()
+            Robot.objects.filter(serial_number=serial).update(
+                company=Company.objects.get(company_name=new_company)
+            )
 
         RobotModificationHistory(
             robot_id=Robot.objects.get(serial_number=serial),
