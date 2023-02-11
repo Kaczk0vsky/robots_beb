@@ -33,6 +33,7 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 
 @api_view(["GET"])
+# EP reurning all robots in database
 def return_all_robots(request):
     robot_data = Robot.objects.all().count()
     index = 1
@@ -48,6 +49,7 @@ def return_all_robots(request):
 
 
 @api_view(["GET"])
+# EP returning all robots latest data
 def return_robot_data(request):
     robot_data = Robot.objects.all().count()
     index = 1
@@ -98,33 +100,10 @@ def add_new_robot(request):
 
 
 @api_view(["GET", "POST"])
-def return_telemetry(request):
-    template = loader.get_template("return_telemetry.html")
-    if request.method == "POST":
-        fromdate = request.POST.get("fromdate")
-        todate = request.POST.get("todate")
-        serial = request.POST.get("serial_number")
-        data = SensorLog.objects.filter(
-            sensor_id=Sensor.objects.get(
-                type="telemetry", robot_id=Robot.objects.get(pk=serial)
-            ),
-            timestamp__range=[fromdate, todate],
-        ).values(
-            "timestamp",
-            "telemetry_humidity",
-            "telemetry_temperature",
-            "telemetry_pressure",
-        )
-
-        return Response(data)
-    else:
-        return HttpResponse(template.render({}, request))
-
-
-@api_view(["GET", "POST"])
-def return_location(request):
-    template = loader.get_template("return_location.html")
-    if request.method == "POST":
+def return_logs(request):
+    # EP returning location logs for specified robot in specified timestamp
+    template = loader.get_template("return_logs.html")
+    if request.method == "POST" and "search_location" in request.POST:
         fromdate = request.POST.get("fromdate")
         todate = request.POST.get("todate")
         serial = request.POST.get("serial_number")
@@ -139,11 +118,47 @@ def return_location(request):
             "location_longitude",
         )
         return Response(data)
+
+    # EP returning telemetry logs for specified robot in specified timestamp
+    elif request.method == "POST" and "search_telemetry" in request.POST:
+        fromdate = request.POST.get("fromdate_telemetry")
+        todate = request.POST.get("todate_telemetry")
+        serial = request.POST.get("serial_number_telemetry")
+        data = SensorLog.objects.filter(
+            sensor_id=Sensor.objects.get(
+                type="telemetry", robot_id=Robot.objects.get(pk=serial)
+            ),
+            timestamp__range=[fromdate, todate],
+        ).values(
+            "timestamp",
+            "telemetry_humidity",
+            "telemetry_temperature",
+            "telemetry_pressure",
+        )
+        return Response(data)
+
+    # EP for deleting location of specified robot in selected day
+    elif request.method == "POST" and "delete" in request.POST:
+        day = str(request.POST.get("day"))
+        serial = request.POST.get("serial")
+        date_list = day.split("-")
+
+        x = SensorLog.objects.filter(
+            sensor_id=Sensor.objects.get(
+                type="location", robot_id=Robot.objects.get(pk=serial)
+            ),
+            timestamp__year=date_list[0],
+            timestamp__month=date_list[1],
+            timestamp__day=date_list[2],
+        ).delete()
+        data = "Deleted logs from specified day!"
+        return Response(data)
     else:
         return HttpResponse(template.render({}, request))
 
 
 @api_view(["GET"])
+# EP returning latest robot location logs for all robots
 def return_latest_location(request):
     number_of_robots = Robot.objects.count()
     index = 1
@@ -293,6 +308,8 @@ def configure_communication(request):
         return HttpResponse(template.render({}, request))
 
 
+@api_view(["GET", "POST"])
+# EP for changing robot parameters
 def change_parameters(request):
     template = loader.get_template("change_parameters.html")
     serial = request.POST.get("serial")
@@ -342,6 +359,6 @@ def change_parameters(request):
         ).save()
 
         data = RobotModificationHistory.objects.all().values()
-        return HttpResponseRedirect("/return_all/")
+        return Response(data)
     else:
         return HttpResponse(template.render(data, request))
