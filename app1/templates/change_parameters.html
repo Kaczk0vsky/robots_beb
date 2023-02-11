@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <center>
+        <form method="POST">
+            {% csrf_token %}
+            <hr />
+            <p>Detach specified communication device from specified robot:</p>
+            <table border='1'>
+                <td>
+                </td>
+                <td>
+                    <p>Serial number:</p>
+                </td>
+                <td>
+                    <p>Production date:</p>
+                </td>
+                <td>
+                    <p>Type:</p>
+                </td>
+                <td>
+                    <p>Company:</p>
+                </td>
+                <tr>
+                    <td>
+                        <p>Robot parameters:</p>
+                    </td>
+                    <td>
+                        <input type="text" name="serial" />
+                    </td>
+                    <td>{{ production_date }}</td>
+                    <td>{{ type }}</td>
+                    <td>{{ company }}</td>
+                </tr>
+                <tr>
+                    <td>
+                        <p>Change to:</p>
+                    </td>
+                    <td>{{ serial_number }}</td>
+                    <td>
+                        <input type="text" name="new_date" />
+                    </td>
+                    <td>
+                        <input type="text" name="new_type" />
+                    </td>
+                    <td>
+                        <input type="text" name="new_company" />
+                    </td>
+                </tr>
+            </table>
+            <hr />
+            <input type="submit" value="Get robot parameters" name="get_robot">
+            <hr />
+            <input type="submit" value="Set new robot parameters" name="set_robot">
+            <hr />
+        </form>
+    </center>
+</body>
+
+</html>

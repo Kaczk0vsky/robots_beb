@@ -79,3 +79,15 @@ class SensorLog(models.Model):
 
     def __str__(self):
         return f"Log [{self.id}] on {self.sensor_id}. Data: [{self.telemetry_humidity}], [{self.telemetry_temperature}], [{self.telemetry_pressure}], [{self.location_latitude}], [{self.location_longitude}]"
+
+
+# history of robot modifications
+class RobotModificationHistory(models.Model):
+    # unique id
+    id = models.IntegerField(editable=False, primary_key=True, unique=True)
+    # robot to which sensor is attached
+    robot_id = models.ForeignKey(Robot, on_delete=models.CASCADE, editable=False)
+    # field for storing modification message
+    text = models.TextField()
+    # timestamp for entering data
+    timestamp = models.DateTimeField(default=timezone.now, editable=False)

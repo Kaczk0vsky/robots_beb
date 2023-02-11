@@ -9,6 +9,8 @@ from app1.views import (
     return_latest_location,
     update_robot,
     configure_communication,
+    change_parameters,
+    create_device,
 )
 
 urlpatterns = [
@@ -24,4 +26,6 @@ urlpatterns = [
     ),
     path("modify_robot/", update_robot, name="Update_robot_brand"),
     path("communication/", configure_communication, name="Configure_communication"),
+    path("update/", change_parameters, name="Change_robot_parameters"),
+    path("communication/", create_device, name="Configure_communication"),
 ]

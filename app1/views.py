@@ -1,9 +1,4 @@
-from django.http import (
-    HttpResponse,
-    HttpResponseRedirect,
-    JsonResponse,
-    HttpResponseNotFound,
-)
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.shortcuts import render
 from django.db import connection
@@ -14,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 from app1.serializers import UserSerializer, GroupSerializer
-from app1.models import Robot, SensorLog, Sensor
+from app1.models import Robot, SensorLog, Sensor, RobotModificationHistory
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -80,7 +75,7 @@ def add_new_robot(request):
             type=type,
             company=company,
         ).save()
-        return HttpResponseRedirect("/app1/return_all/")
+        return HttpResponseRedirect("/return_all/")
     else:
         form = Robot()
     return render(request, "add_new.html")
@@ -164,7 +159,7 @@ def update_robot(request):
         serial = request.POST.get("serial_number")
         type = request.POST.get("type")
         Robot.objects.filter(pk=serial).update(type=type)
-        return HttpResponseRedirect("/app1/return_all/")
+        return HttpResponseRedirect("/robots/return_all/")
     else:
         template = loader.get_template("modify_robot.html")
     return HttpResponse(template.render({}, request))
@@ -241,5 +236,67 @@ def configure_communication(request):
         data = Sensor.objects.all().values()
         return Response(data)
 
+    else:
+        return HttpResponse(template.render({}, request))
+
+
+def change_parameters(request):
+    template = loader.get_template("change_parameters.html")
+    serial = request.POST.get("serial")
+    data = {}
+    if request.method == "POST" and "get_robot" in request.POST:
+        data = (
+            Robot.objects.filter(serial_number=serial)
+            .values(
+                "serial_number",
+                "production_date",
+                "type",
+                "company",
+            )
+            .get()
+        )
+        return HttpResponse(template.render(data, request))
+    elif request.method == "POST" and "set_robot" in request.POST:
+        new_date = request.POST.get("new_date")
+        new_type = request.POST.get("new_type")
+        new_company = request.POST.get("new_company")
+        robot_msg = f"Changed parameters: \n"
+
+        if new_date != "":
+            robot_msg = (
+                robot_msg
+                + f"- production date - from {Robot.objects.values_list('production_date', flat=True).get(serial_number=serial)} to {new_date} \n"
+            )
+            Robot.objects.filter(serial_number=serial).update(production_date=new_date)
+
+        if new_type != "":
+            robot_msg = (
+                robot_msg
+                + f"- type - from {Robot.objects.values_list('type', flat=True).get(serial_number=serial)} to {new_type} \n"
+            )
+            Robot.objects.filter(serial_number=serial).update(type=new_type)
+
+        if new_company != "":
+            robot_msg = (
+                robot_msg
+                + f"- company - from {Robot.objects.values_list('company', flat=True).get(serial_number=serial)} to {new_company} \n"
+            )
+            Robot.objects.filter(serial_number=serial).update(company=new_company)
+
+        RobotModificationHistory(
+            robot_id=Robot.objects.get(serial_number=serial),
+            text=robot_msg,
+        ).save()
+
+        data = RobotModificationHistory.objects.all().values()
+        return HttpResponseRedirect("/return_all/")
+    else:
+        return HttpResponse(template.render(data, request))
+
+
+def create_device(request):
+    template = loader.get_template("communication.html")
+    if request.method == "POST" and "create_device" in request.POST:
+        pass
     else:
         return HttpResponse(template.render({}, request))
