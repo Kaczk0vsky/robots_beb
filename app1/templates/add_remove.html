@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+  <center>
+    <form method="post">
+      {% csrf_token %}
+      <hr />
+      <p>Add new robot:</p>
+      <table border='1'>
+        <td>
+          <p>Serial number:</p>
+        </td>
+        <td>
+          <p>Production date (YYYY-MM-DD):</p>
+        </td>
+        <td>
+          <p>Type:</p>
+        </td>
+        <td>
+          <p>Company:</p>
+        </td>
+        <tr>
+          <td><input id="serial_number" type="text" name="serial_number" maxlength="5" required></td>
+          <td><input id="production_date" type="text" name="production_date" maxlength="10" required></td>
+          <td><input id="type" type="text" name="type" maxlength="10" required></td>
+          <td><input id="company" type="text" name="company" maxlength="20" required></td>
+        </tr>
+      </table>
+      <input type="submit" value="Add robot" name="add_new">
+
+      <hr />
+      <p>Remove robot:</p>
+      <table border='1'>
+        <td>
+          <p>Serial number:</p>
+        </td>
+        <tr>
+          <td><input id="serial_number" type="text" name="serial_to_remove" maxlength="5"></td>
+        </tr>
+      </table>
+      <input type="submit" value="Remove robot" name="remove">
+
+      <hr />
+      <p>Modify type:</p>
+      <table border='1'>
+        <td>
+          <p>Serial number:</p>
+        </td>
+        <td>
+          <p>Type:</p>
+        </td>
+        <tr>
+          <td><input id="serial_number" type="text" name="serial_modify"></td>
+          <td><input id="type" type="text" name="type_modify"></td>
+        </tr>
+      </table>
+      <input type="submit" value="Modify type" name="modify">
+      <hr />
+    </form>
+  </center>
+</body>
+
+</html>

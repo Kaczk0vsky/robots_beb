@@ -64,7 +64,10 @@ def return_robot_data(request):
 
 @api_view(["GET", "POST"])
 def add_new_robot(request):
-    if request.method == "POST":
+    template = loader.get_template("add_remove.html")
+
+    # EP for adding new robot to database
+    if request.method == "POST" and "add_new" in request.POST:
         serial_number = request.POST.get("serial_number")
         production_date = request.POST.get("production_date")
         type = request.POST.get("type")
@@ -76,9 +79,22 @@ def add_new_robot(request):
             company=company,
         ).save()
         return HttpResponseRedirect("/return_all/")
-    else:
-        form = Robot()
-    return render(request, "add_new.html")
+
+    # EP for removing robot from database with saved sensor log history
+    elif request.method == "POST" and "remove" in request.POST:
+        robot_to_remove = request.POST.get("serial_to_remove")
+        Sensor.objects.filter(robot_id=robot_to_remove).update(robot_id=None)
+        Robot.objects.get(pk=robot_to_remove).delete()
+        return HttpResponseRedirect("/return_all/")
+
+    # EP for modifying robot type
+    elif request.method == "POST" and "modify" in request.POST:
+        serial = request.POST.get("serial_modify")
+        type = request.POST.get("type_modify")
+        Robot.objects.filter(pk=serial).update(type=type)
+        return HttpResponseRedirect("/return_all/")
+
+    return HttpResponse(template.render({}, request))
 
 
 @api_view(["GET", "POST"])
@@ -151,18 +167,6 @@ def return_latest_location(request):
         data.update(temp)
         index += 1
     return Response(data)
-
-
-@api_view(["GET", "POST"])
-def update_robot(request):
-    if request.method == "POST":
-        serial = request.POST.get("serial_number")
-        type = request.POST.get("type")
-        Robot.objects.filter(pk=serial).update(type=type)
-        return HttpResponseRedirect("/robots/return_all/")
-    else:
-        template = loader.get_template("modify_robot.html")
-    return HttpResponse(template.render({}, request))
 
 
 @api_view(["GET", "POST"])
