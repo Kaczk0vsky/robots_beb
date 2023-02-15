@@ -7,6 +7,8 @@ class Company(models.Model):
     id = models.IntegerField(primary_key=True, unique=True, editable=False)
     # company name
     company_name = models.CharField(max_length=256, unique=True)
+    # NIP
+    nip = models.IntegerField(default=0, unique=True)
 
     def __str__(self):
         return self.company_name

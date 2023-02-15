@@ -8,6 +8,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
+import requests
+import datetime
+
 from app1.serializers import UserSerializer, GroupSerializer
 from app1.models import Robot, SensorLog, Sensor, RobotModificationHistory, Company
 
@@ -99,6 +102,26 @@ def add_new_robot(request):
         type = request.POST.get("type_modify")
         Robot.objects.filter(pk=serial).update(type=type)
         return HttpResponseRedirect("/return_all/")
+
+    # EP for adding company based on given NIP
+    elif request.method == "POST" and "add_company" in request.POST:
+        nip = request.POST.get("nip")
+        today_date = datetime.date.today()
+        data = requests.get(
+            f"https://wl-api.mf.gov.pl/api/search/nip/{nip}?date={today_date}"
+        )
+        result = data.json()
+
+        get_result = result["result"]
+        get_subject = get_result["subject"]
+        company_name = get_subject["name"]
+
+        Company(
+            company_name=company_name,
+            nip=nip,
+        ).save()
+
+        return Response(result)
 
     return HttpResponse(template.render({}, request))
 
