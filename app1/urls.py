@@ -11,7 +11,7 @@ from app1.views import (
 )
 
 urlpatterns = [
-    path("return_all/", return_all_robots, name="Return_all_robots"),
+    path("robots/", return_all_robots, name="Return_all_robots"),
     path("return_robot_data/", return_robot_data, name="Return_robot_data"),
     path("add_remove/", add_new_robot, name="Add_new_robot"),
     path("return_logs/", return_logs, name="Return_location"),

@@ -4,9 +4,9 @@ from django.shortcuts import render
 from django.db import connection
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets, permissions, authentication
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.pagination import PageNumberPagination
 
 import requests
 import datetime
@@ -36,19 +36,13 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 
 @api_view(["GET"])
-# EP reurning all robots in database
+# EP reutrning all robots in database
 def return_all_robots(request):
-    robot_data = Robot.objects.all().count()
-    index = 1
-    data = {}
-    while index <= robot_data:
-        data[index] = (
-            Robot.objects.filter(pk=index)
-            .values_list("serial_number", "type", "company")
-            .get()
-        )
-        index += 1
-    return Response(data)
+    robots = Robot.objects.all().values("serial_number", "type", "company")
+    paginator = PageNumberPagination()
+    result_data = paginator.paginate_queryset(robots, request)
+
+    return Response(result_data)
 
 
 @api_view(["GET"])
