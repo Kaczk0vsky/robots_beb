@@ -8,6 +8,7 @@ from app1.views import (
     return_latest_location,
     configure_communication,
     change_parameters,
+    RobotViewSet,
 )
 
 urlpatterns = [
@@ -22,4 +23,5 @@ urlpatterns = [
     ),
     path("communication/", configure_communication, name="Configure_communication"),
     path("update/", change_parameters, name="Change_robot_parameters"),
+    path("filter/", RobotViewSet.as_view()),
 ]

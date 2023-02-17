@@ -3,7 +3,9 @@ from django.template import loader
 from django.shortcuts import render
 from django.db import connection
 from django.contrib.auth.models import User, Group
-from rest_framework import viewsets, permissions, authentication
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets, permissions, authentication, filters
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
@@ -11,7 +13,7 @@ from rest_framework.pagination import PageNumberPagination
 import requests
 import datetime
 
-from app1.serializers import UserSerializer, GroupSerializer
+from app1.serializers import UserSerializer, GroupSerializer, RobotSerializer
 from app1.models import Robot, SensorLog, Sensor, RobotModificationHistory, Company
 
 
@@ -33,6 +35,22 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class RobotViewSet(APIView):
+    """
+    List all robots in database.
+    """
+
+    queryset = Robot.objects.all()
+    serializer_class = RobotSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["serial_number", "production_date", "type", "company"]
+
+    def get(self, request, format=None):
+        robots = Robot.objects.all().values()
+        return Response(robots)
 
 
 @api_view(["GET"])
