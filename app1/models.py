@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import Group
 
 # company class
 class Company(models.Model):
@@ -8,7 +9,11 @@ class Company(models.Model):
     # company name
     company_name = models.CharField(max_length=256, unique=True)
     # NIP
-    nip = models.IntegerField(default=0, unique=True)
+    nip = models.IntegerField(blank=True, null=True, unique=True)
+    # one to one relation from company to group model
+    group = models.OneToOneField(
+        Group, on_delete=models.CASCADE, blank=True, null=True, unique=True
+    )
 
     def __str__(self):
         return self.company_name
@@ -42,7 +47,9 @@ class Robot(models.Model):
         default="4 wheeler",
     )
     # robot company which own it
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    company = models.ForeignKey(
+        Company, on_delete=models.CASCADE, null=True, blank=True
+    )
 
     def __str__(self):
         return self.serial_number

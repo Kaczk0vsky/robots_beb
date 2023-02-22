@@ -98,19 +98,27 @@ def make_robot_info():
 def add_robot():
     # creating robot class
     robot = robot_info()
-    if Company.objects.filter(company_name=robot["company"]).exists():
-        pass
-    else:
-        Company(company_name=robot["company"]).save()
+    if robot["company"] != "":
+        if Company.objects.filter(company_name=robot["company"]).exists():
+            pass
+        else:
+            Company(company_name=robot["company"]).save()
     if Robot.objects.filter(pk=robot["serial_number"]).exists():
         pass
     else:
-        Robot(
-            serial_number=robot["serial_number"],
-            production_date=robot["production_date"],
-            type=robot["type"],
-            company=Company.objects.get(company_name=robot["company"]),
-        ).save()
+        if robot["company"] != "":
+            Robot(
+                serial_number=robot["serial_number"],
+                production_date=robot["production_date"],
+                type=robot["type"],
+                company=Company.objects.get(company_name=robot["company"]),
+            ).save()
+        else:
+            Robot(
+                serial_number=robot["serial_number"],
+                production_date=robot["production_date"],
+                type=robot["type"],
+            ).save()
 
     # adding one telemetry sensor and one location sensor
     if Sensor.objects.filter(

@@ -1,8 +1,8 @@
 [robot_info]
-serial_number = '1'
-production_date = '2023-02-11'
-type = '4 wheeler'
-company = 'Arcellor'
+serial_number = '4'
+production_date = '2023-01-01'
+type = 'flying'
+company = ''
 
 [mqtt]
 topic = 'task1_beb'

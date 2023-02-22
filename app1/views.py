@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.shortcuts import render
-from django.db import connection
+from django.db import connection, models
 from django.contrib.auth.models import User, Group
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions, authentication, filters
@@ -56,7 +56,17 @@ class RobotViewSet(APIView):
 @api_view(["GET"])
 # EP reutrning all robots in database
 def return_all_robots(request):
-    robots = Robot.objects.all().values("serial_number", "type", "company")
+    logged = request.user
+    current_user = User.objects.filter(username=logged.username).values("groups").get()
+    if current_user["groups"] == None:
+        robots = Robot.objects.all().values("serial_number", "type", "company")
+    else:
+        robots = (
+            Robot.objects.filter(company=current_user["groups"])
+            .all()
+            .values("serial_number", "type", "company")
+        )
+
     paginator = PageNumberPagination()
     result_data = paginator.paginate_queryset(robots, request)
 
@@ -66,16 +76,89 @@ def return_all_robots(request):
 @api_view(["GET"])
 # EP returning all robots latest data
 def return_robot_data(request):
+    logged = request.user
+    current_user = User.objects.filter(username=logged.username).values("groups").get()
+    group_name = Group.objects.filter(pk=current_user["groups"]).values("name").get()
     robot_data = Robot.objects.all().count()
-    index = 1
-    data = {}
-    while index <= robot_data:
-        data[index] = (
-            f"{Robot.objects.filter(serial_number=index).values_list('production_date', 'type', 'company').get()}"
-            + f"{SensorLog.objects.filter(sensor_id=Sensor.objects.get(type='telemetry')).last()}"
-            + f"{SensorLog.objects.filter(sensor_id=Sensor.objects.get(type='location')).last()}"
+
+    if current_user["groups"] == None:
+        index = 1
+        data = {}
+        while index <= robot_data:
+            data[index] = (
+                f"{Robot.objects.filter(serial_number=index).values_list('production_date', 'type', 'company').get()}"
+                + f"{SensorLog.objects.filter(sensor_id=Sensor.objects.get(type='telemetry')).last()}"
+                + f"{SensorLog.objects.filter(sensor_id=Sensor.objects.get(type='location')).last()}"
+            )
+            index += 1
+    else:
+        robot_params = (
+            Robot.objects.filter(company=current_user["groups"])
+            .all()
+            .values("serial_number", "production_date", "type", "company")
         )
-        index += 1
+
+        index = 1
+        telemetry_logs = {}
+        location_logs = {}
+
+        while index <= robot_data:
+            temp_company = (
+                Robot.objects.filter(serial_number=index).values("company").get()
+            )
+            if current_user["groups"] == temp_company["company"]:
+                temp_telemetry_logs = {
+                    index: (
+                        SensorLog.objects.filter(
+                            sensor_id=Sensor.objects.get(
+                                robot_id=Robot.objects.get(
+                                    company=Company.objects.get(
+                                        company_name=group_name["name"]
+                                    ),
+                                    serial_number=index,
+                                ),
+                                type="telemetry",
+                            )
+                        )
+                        .values(
+                            "timestamp",
+                            "telemetry_humidity",
+                            "telemetry_temperature",
+                            "telemetry_pressure",
+                        )
+                        .last()
+                    )
+                }
+                temp_location_logs = {
+                    index: (
+                        SensorLog.objects.filter(
+                            sensor_id=Sensor.objects.get(
+                                robot_id=Robot.objects.get(
+                                    company=Company.objects.get(
+                                        company_name=group_name["name"]
+                                    ),
+                                    serial_number=index,
+                                ),
+                                type="location",
+                            )
+                        )
+                        .values(
+                            "timestamp",
+                            "location_latitude",
+                            "location_longitude",
+                        )
+                        .last()
+                    )
+                }
+                telemetry_logs.update(temp_telemetry_logs)
+                location_logs.update(temp_location_logs)
+            index += 1
+
+        data = {
+            "robot_data": robot_params,
+            "telemetry_logs": telemetry_logs,
+            "location_logs": location_logs,
+        }
     return Response(data)
 
 
@@ -128,9 +211,11 @@ def add_new_robot(request):
         get_subject = get_result["subject"]
         company_name = get_subject["name"]
 
+        Group(name=company_name).save()
         Company(
             company_name=company_name,
             nip=nip,
+            group=Group.objects.get(name=company_name),
         ).save()
 
         return Response(result)
@@ -140,6 +225,9 @@ def add_new_robot(request):
 
 @api_view(["GET", "POST"])
 def return_logs(request):
+    logged = request.user
+    current_user = User.objects.filter(username=logged.username).values("groups").get()
+
     # EP returning location logs for specified robot in specified timestamp
     template = loader.get_template("return_logs.html")
     if request.method == "POST" and "search_location" in request.POST:
@@ -148,7 +236,10 @@ def return_logs(request):
         serial = request.POST.get("serial_number")
         data = SensorLog.objects.filter(
             sensor_id=Sensor.objects.get(
-                type="location", robot_id=Robot.objects.get(pk=serial)
+                type="location",
+                robot_id=Robot.objects.filter(
+                    pk=serial, company=Company.objects.get(id=current_user["groups"])
+                ).get(),
             ),
             timestamp__range=[fromdate, todate],
         ).values(
@@ -165,7 +256,10 @@ def return_logs(request):
         serial = request.POST.get("serial_number_telemetry")
         data = SensorLog.objects.filter(
             sensor_id=Sensor.objects.get(
-                type="telemetry", robot_id=Robot.objects.get(pk=serial)
+                type="telemetry",
+                robot_id=Robot.objects.filter(
+                    pk=serial, company=Company.objects.get(id=current_user["groups"])
+                ).get(),
             ),
             timestamp__range=[fromdate, todate],
         ).values(
@@ -220,27 +314,64 @@ def return_logs(request):
 @api_view(["GET"])
 # EP returning latest robot location logs for all robots
 def return_latest_location(request):
+    logged = request.user
+    current_user = User.objects.filter(username=logged.username).values("groups").get()
+
     number_of_robots = Robot.objects.count()
     index = 1
     data = {}
-    while index <= number_of_robots:
-        temp = {
-            index: (
-                SensorLog.objects.filter(
-                    sensor_id=Sensor.objects.get(
-                        type="location", robot_id=Robot.objects.get(pk=index)
-                    ),
+    if current_user["groups"] == None:
+        while index <= number_of_robots:
+            temp = {
+                index: (
+                    SensorLog.objects.filter(
+                        sensor_id=Sensor.objects.get(
+                            type="location",
+                            robot_id=Robot.objects.get(
+                                pk=index,
+                            ),
+                        ),
+                    )
+                    .values(
+                        "timestamp",
+                        "location_latitude",
+                        "location_longitude",
+                    )
+                    .last()
                 )
-                .values(
-                    "timestamp",
-                    "location_latitude",
-                    "location_longitude",
-                )
-                .last()
+            }
+            data.update(temp)
+            index += 1
+    else:
+        while index <= number_of_robots:
+            temp_company = (
+                Robot.objects.filter(serial_number=index).values("company").get()
             )
-        }
-        data.update(temp)
-        index += 1
+            if current_user["groups"] == temp_company["company"]:
+                print(index)
+                temp = {
+                    index: (
+                        SensorLog.objects.filter(
+                            sensor_id=Sensor.objects.get(
+                                type="location",
+                                robot_id=Robot.objects.filter(
+                                    pk=index,
+                                    company=Company.objects.get(
+                                        id=current_user["groups"]
+                                    ),
+                                ).get(),
+                            ),
+                        )
+                        .values(
+                            "timestamp",
+                            "location_latitude",
+                            "location_longitude",
+                        )
+                        .last()
+                    )
+                }
+                data.update(temp)
+            index += 1
     return Response(data)
 
 
