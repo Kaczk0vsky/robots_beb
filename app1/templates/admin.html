@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <center>
+        <form method="POST">
+            {% csrf_token %}
+            <hr />
+            <hr />
+            <p>COMMUNICATION</p>
+            <hr />
+            <hr />
+            <p>Create communication device:</p>
+            <table border='1'>
+                <td>
+                    <p>Device type:</p>
+                </td>
+                <td>
+                    <input type="checkbox" name="type_telemetry" value="True">
+                    <label for="telemetry">telemetry</label><br>
+                    <input type="checkbox" name="type_location" value="True">
+                    <label for="telemetry">location</label><br>
+                </td>
+            </table>
+            <input type="submit" value="Create" name="create_device">
+            <hr />
+
+            <p>Detach specified communication device from specified robot:</p>
+            <table border='1'>
+                <td>
+                    <p>Device type:</p>
+                </td>
+                <td>
+                    <input type="checkbox" name="telemetry_1" value="True">
+                    <label for="telemetry">telemetry</label><br>
+                    <input type="checkbox" name="location_1" value="True">
+                    <label for="telemetry">location</label><br>
+                </td>
+                <tr>
+                    <td>
+                        <p>Robot serial number:</p>
+                    </td>
+                    <td>
+                        <input type="text" name="serial_1" />
+                    </td>
+                </tr>
+            </table>
+            <input type="submit" value="Detach communication" name="detach">
+            <hr />
+
+            <p>Attach specified communication device to specified robot:</p>
+            <table border='1'>
+                <td>
+                    <p>Device type:</p>
+                </td>
+                <td>
+                    <input type="checkbox" name="telemetry_2" value="True">
+                    <label for="telemetry">telemetry</label><br>
+                    <input type="checkbox" name="location_2" value="True">
+                    <label for="telemetry">location</label><br>
+                </td>
+                <tr>
+                    <td>
+                        <p>Robot serial number:</p>
+                    </td>
+                    <td>
+                        <input type="text" name="serial_2" />
+                    </td>
+                </tr>
+            </table>
+            <input type="submit" value="Attach communication" name="attach">
+            <hr />
+
+            <p>Detach specified communication device from one robot and attach to another:</p>
+            <table border='1'>
+                <td>
+                    <p>Device type:</p>
+                </td>
+                <td>
+                    <input type="checkbox" name="telemetry_3" value="True">
+                    <label for="telemetry">telemetry</label><br>
+                    <input type="checkbox" name="location_3" value="True">
+                    <label for="telemetry">location</label><br>
+                </td>
+                <tr>
+                    <td>
+                        <p>Detach from:</p>
+                    </td>
+                    <td>
+                        <input type="text" name="serial_3" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p>Attach to:</p>
+                    </td>
+                    <td>
+                        <input type="text" name="serial_4" />
+                    </td>
+                </tr>
+            </table>
+            <input type="submit" value="Move communication device" name="swap">
+            <hr />
+            <hr />
+            <p>CHANGING/ADDING/REMOVING ELEMENTS IN DATABASE</p>
+            <hr />
+            <hr />
+            <p>Change robot parameters:</p>
+            <table border='1'>
+                <td>
+                </td>
+                <td>
+                    <p>Serial number:</p>
+                </td>
+                <td>
+                    <p>Production date:</p>
+                </td>
+                <td>
+                    <p>Type:</p>
+                </td>
+                <td>
+                    <p>Company:</p>
+                </td>
+                <tr>
+                    <td>
+                        <p>Robot parameters:</p>
+                    </td>
+                    <td>
+                        <input type="text" name="serial" />
+                    </td>
+                    <td>{{ production_date }}</td>
+                    <td>{{ type }}</td>
+                    <td>{{ company }}</td>
+                </tr>
+                <tr>
+                    <td>
+                        <p>Change to:</p>
+                    </td>
+                    <td>{{ serial_number }}</td>
+                    <td>
+                        <input type="text" name="new_date" />
+                    </td>
+                    <td>
+                        <input type="text" name="new_type" />
+                    </td>
+                    <td>
+                        <input type="text" name="new_company" />
+                    </td>
+                </tr>
+            </table>
+            <hr />
+            <input type="submit" value="Get robot parameters" name="get_robot">
+            <hr />
+            <input type="submit" value="Set new robot parameters" name="set_robot">
+            <hr />
+            <p>Add new robot:</p>
+            <table border='1'>
+                <td>
+                    <p>Serial number:</p>
+                </td>
+                <td>
+                    <p>Production date (YYYY-MM-DD):</p>
+                </td>
+                <td>
+                    <p>Type:</p>
+                </td>
+                <td>
+                    <p>Company:</p>
+                </td>
+                <tr>
+                    <td><input id="serial_number" type="text" name="serial_number" maxlength="5"></td>
+                    <td><input id="production_date" type="text" name="production_date" maxlength="10"></td>
+                    <td><input id="type" type="text" name="type" maxlength="10"></td>
+                    <td><input id="company" type="text" name="company" maxlength="20"></td>
+                </tr>
+            </table>
+            <input type="submit" value="Add robot" name="add_new">
+
+            <hr />
+            <p>Remove robot:</p>
+            <table border='1'>
+                <td>
+                    <p>Serial number:</p>
+                </td>
+                <tr>
+                    <td><input id="serial_number" type="text" name="serial_to_remove" maxlength="5"></td>
+                </tr>
+            </table>
+            <input type="submit" value="Remove robot" name="remove">
+
+            <hr />
+            <p>Modify type:</p>
+            <table border='1'>
+                <td>
+                    <p>Serial number:</p>
+                </td>
+                <td>
+                    <p>Type:</p>
+                </td>
+                <tr>
+                    <td><input id="serial_number" type="text" name="serial_modify"></td>
+                    <td><input id="type" type="text" name="type_modify"></td>
+                </tr>
+            </table>
+            <input type="submit" value="Modify type" name="modify">
+
+            <hr />
+            <p>Add new company:</p>
+            <table border='1'>
+                <td>
+                    <p>NIP:</p>
+                </td>
+                <tr>
+                    <td><input id="nip" type="text" name="nip"></td>
+                </tr>
+            </table>
+            <input type="submit" value="Add company" name="add_company">
+            <hr />
+            <hr />
+            <p>ROBOT LOGS</p>
+            <hr />
+            <hr />
+            <p>Delete location logs for specified robot:</p>
+            Select day: <input type="date" name="day" />
+            Serial number: <input type="text" name="serial" />
+            <input type="submit" value="Delete logs" name="delete" />
+
+            <hr />
+            <p>Change temperature logs for specified robot/robots (use semicolons to separate serial numbers):</p>
+            Serial number: <input type="text" name="serial_temp" />
+            Temperature: <input type="text" name="temperature" />
+            Select day: <input type="date" name="temp_day" />
+            <input type="submit" value="Change temperature logs" name="change" />
+            <hr />
+        </form>
+    </center>
+</body>
+
+</html>

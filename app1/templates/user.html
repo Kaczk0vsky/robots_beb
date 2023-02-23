@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <center>
+        <hr />
+        <hr />
+        <p>GET ROBOT LOGS</p>
+        <hr />
+        <hr />
+        <p>Filter telemetry records between two given dates for specified robot:</p>
+        <form method="POST">
+            {% csrf_token %}
+
+            From :<input type="date" name="fromdate_telemetry" />
+            To :<input type="date" name="todate_telemetry" />
+            Serial number :<input type="text" name="serial_number_telemetry" />
+            <input type="submit" value="Search" name="search_telemetry" />
+
+            <hr />
+            <p>Filter location records between two given dates for specified robot:</p>
+            From: <input type="date" name="fromdate" />
+            To: <input type="date" name="todate" />
+            Serial number: <input type="text" name="serial_number" />
+            <input type="submit" value="Search" name="search_location" />
+
+            <hr />
+            <input type="submit" value="Show all robots" name="return_all" />
+
+            <hr />
+            <input type="submit" value="Show latest robot logs" name="return_latest" />
+
+            <hr />
+            <input type="submit" value="Show latest robot location logs" name="return_latest_location" />
+            <hr />
+
+        </form>
+    </center>
+</body>
+
+</html>
