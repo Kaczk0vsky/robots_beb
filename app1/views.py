@@ -1,22 +1,17 @@
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponse
 from django.template import loader
 from django.shortcuts import render
-from django.db import connection
 from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django_filters.rest_framework import DjangoFilterBackend
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from rest_framework import viewsets, permissions, authentication, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.authtoken.models import Token
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 
 import requests
 import datetime
@@ -45,37 +40,21 @@ class GroupViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class RobotViewSet(APIView):
-    """
-    List all robots in database.
-    """
-
-    queryset = Robot.objects.all()
-    serializer_class = RobotSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["serial_number", "production_date", "type", "company"]
-
-    def get(self, request, format=None):
-        robots = Robot.objects.all().values()
-        return Response(robots)
-
-
 class UserView(APIView):
     """
     Class that that collects all function together.
     Allows a company user to use some EP. If user with admin privileges is logged in you get access to all elements in database.
     """
 
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
     template = loader.get_template("user.html")
-    permission_required = "app1.change_robot"
 
     def get(self, request, format=None):
-        # content = {
-        #     "user": str(request.user),  # `django.contrib.auth.User` instance.
-        #     "auth": str(request.auth),  # None
-        # }
+        content = {
+            "user": str(request.user),  # `django.contrib.auth.User` instance.
+            "auth": str(request.auth),  # None
+        }
+        print(content)
 
         return HttpResponse(self.template.render({}, request))
 
@@ -380,6 +359,7 @@ class AdminView(APIView, PermissionRequiredMixin):
     Allows an database admin to do evertyhing.
     """
 
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAdminUser]
     template = loader.get_template("admin.html")
 
@@ -643,10 +623,9 @@ class AdminView(APIView, PermissionRequiredMixin):
             data = "Deleted logs from specified day!"
             return Response(data)
 
-        # EP for setting temperature for specified robot/robots for the whole day
+        # EP for setting temperature for specified robot for the whole day
         elif "change" in request.POST:
             serial = str(request.POST.get("serial_temp"))
-            serial_list = serial.split("-")
             day = str(request.POST.get("temp_day"))
             date_list = day.split("-")
             temperature = request.POST.get("temperature")
