@@ -11,6 +11,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.authtoken.models import Token
+from rest_framework.pagination import PageNumberPagination
+
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 
 import requests
@@ -47,6 +49,7 @@ class UserView(APIView):
     """
 
     permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination
     template = loader.get_template("user.html")
 
     def get(self, request, format=None):
@@ -198,12 +201,6 @@ class UserView(APIView):
 
         # EP returning all robots
         elif "return_all" in request.POST:
-            if request.user.is_superuser:
-                print("superuser")
-            elif request.user.is_staff:
-                print("is staff")
-            else:
-                print("normal")
             logged = request.user
             current_user = (
                 User.objects.filter(username=logged.username).values("groups").get()
@@ -214,11 +211,10 @@ class UserView(APIView):
                 data = Robot.objects.filter(company=current_user["groups"]).values(
                     "serial_number", "type", "company"
                 )
+            paginator = PageNumberPagination()
+            result_page = paginator.paginate_queryset(data, request)
 
-            # paginator = PageNumberPagination()
-            # result_data = paginator.paginate_queryset(robots, request)
-            print(data)
-            return Response(data)
+            return Response(result_page)
 
         # EP returning all robots latest data
         elif "return_latest" in request.POST:
