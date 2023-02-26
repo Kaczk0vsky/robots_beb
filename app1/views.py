@@ -22,6 +22,7 @@ import datetime
 
 from app1.serializers import UserSerializer, GroupSerializer, RobotSerializer
 from app1.models import Robot, SensorLog, Sensor, RobotModificationHistory, Company
+from task1_beb.celery import mqtt_send
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -704,8 +705,19 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
         Token.objects.create(user=instance)
 
 
-# Function performing action after saving sensor log object into database
+# Function performing sending mqqt message after saving telemetry sensor log object into database
 @receiver(post_save, sender=SensorLog)
 def save_telemetry_log(sender, instance, **kwargs):
-    print(instance)
-    # type = SensorLog.objects.get(sensor_id=Sensor.objects.get())
+    sensor_id = instance.sensor_id
+    id = (
+        SensorLog.objects.filter(sensor_id=sensor_id)
+        .values_list("sensor_id", flat=True)
+        .last()
+    )
+    type = Sensor.objects.filter(id=id).values_list("type", flat=True).get()
+
+    if type == "telemetry":
+        serial = Sensor.objects.filter(id=id).values_list("robot_id", flat=True).get()
+        robot_data = "Telemetry succesfully saved"
+        robot_topic = "debug/msg"
+        mqtt_send.delay(serial, robot_topic, robot_data)

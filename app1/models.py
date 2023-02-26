@@ -109,7 +109,7 @@ class SensorLog(models.Model):
     location_longitude = models.IntegerField(default=0, editable=False, blank=True)
 
     def __str__(self):
-        return f"Log [{self.id}] on {self.sensor_id}. Data: [{self.telemetry_humidity}], [{self.telemetry_temperature}], [{self.telemetry_pressure}], [{self.location_latitude}], [{self.location_longitude}]"
+        return str(self.id)
 
 
 # history of robot modifications
