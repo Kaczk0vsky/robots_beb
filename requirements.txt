@@ -12,3 +12,4 @@ channels_redis>=4.0.0
 ndg-httpsclient>=0.5.1
 requests>=2.28.2
 django-filter>=22.1
+xhtml2pdf>=0.2.9

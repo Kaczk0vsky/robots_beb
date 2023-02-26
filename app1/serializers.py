@@ -19,4 +19,4 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class RobotSerializer(serializers.Serializer):
     class Meta:
         model = Robot
-        fields = ["serial_number", "production_date", "type", "company"]
+        fields = "__all__"

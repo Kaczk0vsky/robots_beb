@@ -4,6 +4,7 @@ import datetime
 import random
 from django.conf import settings
 from django.utils import timezone
+from django.contrib.staticfiles import finders
 from paho.mqtt import client as mqtt
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task1_beb.settings")

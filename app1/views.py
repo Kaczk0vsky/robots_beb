@@ -6,14 +6,16 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from rest_framework import viewsets, permissions, authentication, filters
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets, permissions, authentication
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.pagination import PageNumberPagination
-
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from xhtml2pdf import pisa
 
 import requests
 import datetime
@@ -50,6 +52,11 @@ class UserView(APIView):
 
     permission_classes = [IsAuthenticated]
     pagination_class = PageNumberPagination
+    serializer_class = RobotSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ["__all__"]
+    ordering_fields = ["__all__"]
+    ordering = ["serial_number"]
     template = loader.get_template("user.html")
 
     def get(self, request, format=None):
@@ -333,7 +340,7 @@ class UserView(APIView):
                     .all()
                 )
                 for index in sensor_id_location:
-                    temp_data = {
+                    temp_location = {
                         f"Robot serial - {element} - sensor id: {index}": SensorLog.objects.filter(
                             sensor_id=Sensor.objects.get(id=index),
                         )
@@ -344,8 +351,51 @@ class UserView(APIView):
                         )
                         .last()
                     }
-                    data.update(temp_data)
+                    location_logs.update(temp_location)
 
+            return Response(data)
+
+        elif "create_report" in request.POST:
+            serial = request.POST.get("serial_number_export")
+
+            data = ""
+            sensor_id_telemetry = (
+                Sensor.objects.filter(
+                    type="telemetry",
+                    robot_id=Robot.objects.get(
+                        pk=serial,
+                    ),
+                )
+                .values_list("id", flat=True)
+                .all()
+            )
+            sensor_id_location = (
+                Sensor.objects.filter(
+                    type="location",
+                    robot_id=Robot.objects.get(
+                        pk=serial,
+                    ),
+                )
+                .values_list("id", flat=True)
+                .all()
+            )
+
+            for index in sensor_id_telemetry:
+                temp_data = f'Robot serial: {serial}, sensor id: {index}, sensor type: telemetry - {SensorLog.objects.filter(sensor_id=Sensor.objects.get(id=index)).values("timestamp","telemetry_humidity","telemetry_temperature", "telemetry_pressure").last()}'
+                data += temp_data
+
+            for index in sensor_id_location:
+                temp_data = f'Robot serial: {serial}, sensor id: {index}, sensor type: location - {SensorLog.objects.filter(sensor_id=Sensor.objects.get(id=index)).values("timestamp","location_latitude","location_longitude").last()}'
+                data += temp_data
+
+            result_file = open("robot_logs.pdf", "w+b")
+            pisa_status = pisa.CreatePDF(data, dest=result_file)
+            result_file.close()
+
+            if pisa_status.err:
+                data = "An error occuered during exporting .pdf file..."
+            else:
+                data = "Exported to .pdf"
             return Response(data)
 
 
