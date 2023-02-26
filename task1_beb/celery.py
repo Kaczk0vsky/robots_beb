@@ -10,7 +10,6 @@ django.setup()
 from app1.models import SensorLog, Sensor
 
 app = Celery("task1_beb")
-client = mqtt.Client()
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.
@@ -22,12 +21,23 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 
-# @shared_task
-# def mqtt_send(robot_serial, robot_topic, robot_data):
-#     client.publish(
-#         f"robot serial-{robot_serial}/{robot_topic}",
-#         robot_data,
-#     )
+@shared_task
+def mqtt_send(robot_serial, robot_topic, robot_data):
+    client = mqtt.Client(transport="websockets")
+    mqtt_username = os.getenv("MQTT_CLIENT_USERNAME")
+    if not mqtt_username:
+        pass
+    else:
+        client.username_pw_set(
+            username=str(os.getenv("MQTT_CLIENT_USERNAME")),
+            password=str(os.getenv("MQTT_CLIENT_PASSWORD")),
+        )
+    client.connect(os.getenv("MQTT_CLIENT_HOST"), int(os.getenv("MQTT_CLIENT_PORT")))
+    client.publish(
+        f"Robot serial: {robot_serial}/{robot_topic}",
+        robot_data,
+    )
+    client.loop_stop()
 
 
 @shared_task
