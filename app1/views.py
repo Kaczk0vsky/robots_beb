@@ -61,12 +61,6 @@ class UserView(APIView):
     template = loader.get_template("user.html")
 
     def get(self, request, format=None):
-        content = {
-            "user": str(request.user),  # `django.contrib.auth.User` instance.
-            "auth": str(request.auth),  # None
-        }
-        print(content)
-
         return HttpResponse(self.template.render({}, request))
 
     def post(self, request, format=None):
@@ -416,7 +410,7 @@ class AdminView(APIView, PermissionRequiredMixin):
     def post(self, request, format=None):
         # EP for changing robot parameters
         if "get_robot" in request.POST:
-            serial = request.POST.get("serial")
+            serial = request.POST.get("serial_get_robot")
             data = (
                 Robot.objects.filter(serial_number=serial)
                 .values(
@@ -429,7 +423,7 @@ class AdminView(APIView, PermissionRequiredMixin):
             )
             return HttpResponse(self.template.render(data, request))
         elif "set_robot" in request.POST:
-            serial = request.POST.get("serial")
+            serial = request.POST.get("serial_get_robot")
             new_date = request.POST.get("new_date")
             new_type = request.POST.get("new_type")
             new_company = request.POST.get("new_company")
@@ -456,13 +450,15 @@ class AdminView(APIView, PermissionRequiredMixin):
                     robot_msg
                     + f"- company - from {Robot.objects.values_list('company', flat=True).get(serial_number=serial)} to {new_company} \n"
                 )
-                if Company.objects.filter(company_name=new_company).exists():
-                    pass
+                if Company.objects.filter(id=new_company).exists():
+                    Robot.objects.filter(serial_number=serial).update(
+                        company=Company.objects.get(id=new_company)
+                    )
                 else:
                     Company(company_name=new_company).save()
-                Robot.objects.filter(serial_number=serial).update(
-                    company=Company.objects.get(company_name=new_company)
-                )
+                    Robot.objects.filter(serial_number=serial).update(
+                        company=Company.objects.get(company_name=new_company)
+                    )
 
             RobotModificationHistory(
                 robot_id=Robot.objects.get(serial_number=serial),
