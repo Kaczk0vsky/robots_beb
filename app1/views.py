@@ -702,3 +702,10 @@ class AdminView(APIView, PermissionRequiredMixin):
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
+
+
+# Function performing action after saving sensor log object into database
+@receiver(post_save, sender=SensorLog)
+def save_telemetry_log(sender, instance, **kwargs):
+    print(instance)
+    # type = SensorLog.objects.get(sensor_id=Sensor.objects.get())

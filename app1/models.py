@@ -86,7 +86,7 @@ class Sensor(models.Model):
     )
 
     def __str__(self):
-        return f"Sensor - [{self.type}] in robot {self.robot_id}"
+        return str(self.id)
 
 
 # log from sensors - one sensor can hava many logs
