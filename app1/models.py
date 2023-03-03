@@ -55,7 +55,7 @@ class Robot(models.Model):
         return self.serial_number
 
 
-# sensor class - one robot can have many sensors
+# sensor class
 class Sensor(models.Model):
     # unique id for each sensor
     id = models.IntegerField(primary_key=True, unique=True, editable=False)
@@ -79,7 +79,7 @@ class Sensor(models.Model):
     robot_id = models.ForeignKey(
         Robot,
         on_delete=models.CASCADE,
-        editable=False,
+        editable=True,
         null=True,
         blank=True,
         db_column="robot_id",
@@ -89,7 +89,7 @@ class Sensor(models.Model):
         return str(self.id)
 
 
-# log from sensors - one sensor can hava many logs
+# logs from sensors
 class SensorLog(models.Model):
     # unique id
     id = models.IntegerField(editable=False, primary_key=True, unique=True)

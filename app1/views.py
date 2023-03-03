@@ -1,13 +1,12 @@
 from django.http import HttpResponse
 from django.template import loader
-from django.shortcuts import render
 from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, permissions, authentication
+from rest_framework import viewsets, permissions
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -323,6 +322,7 @@ class UserView(APIView):
                     .values_list("serial_number", flat=True)
                 )
             data = {}
+            location_logs = {}
             for element in robots_serials:
                 sensor_id_location = (
                     Sensor.objects.filter(
@@ -347,6 +347,9 @@ class UserView(APIView):
                         .last()
                     }
                     location_logs.update(temp_location)
+                data = {
+                    "location_logs": location_logs,
+                }
 
             return Response(data)
 

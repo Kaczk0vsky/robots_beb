@@ -100,7 +100,7 @@ def add_robot():
     # creating robot class
     robot = robot_info()
     if robot["company"] != "":
-        if Company.objects.filter(company_name=robot["company"]).exists():
+        if Company.objects.filter(id=robot["company"]).exists():
             pass
         else:
             Company(company_name=robot["company"]).save()
@@ -112,7 +112,7 @@ def add_robot():
                 serial_number=robot["serial_number"],
                 production_date=robot["production_date"],
                 type=robot["type"],
-                company=Company.objects.get(company_name=robot["company"]),
+                company=Company.objects.get(id=robot["company"]),
             ).save()
         else:
             Robot(

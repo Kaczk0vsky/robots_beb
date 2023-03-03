@@ -1,6 +1,5 @@
 import sys
 import logging
-import threading
 
 sys.path.append("..")
 
@@ -15,17 +14,9 @@ def initialization():
     # Initializing Logger console info
     logger = logging.getLogger(__name__)
 
-    # Initializing MQTT communication
-    mqtt = MqttComunication()
-
-    # Starting threading
-    threads = []
-    threads.append(threading.Thread(target=mqtt.mqtt_loop_forever, daemon=True))
+    # Initializing sending messages every time interval passed
     mqtt_time = TimeMessure()
-    threads.append(threading.Thread(target=mqtt_time.loop_forever))
-
-    for thread in threads:
-        thread.start()
+    mqtt_time.loop_forever()
 
 
 if __name__ == "__main__":

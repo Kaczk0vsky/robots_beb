@@ -1,7 +1,7 @@
-import os
-import django
 from celery import Celery, shared_task
 from paho.mqtt import client as mqtt
+import os
+import django
 
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task1_beb.settings")
