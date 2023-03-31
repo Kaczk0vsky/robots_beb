@@ -632,9 +632,7 @@ class AdminView(APIView, PermissionRequiredMixin):
             )
             result = data.json()
 
-            get_result = result["result"]
-            get_subject = get_result["subject"]
-            company_name = get_subject["name"]
+            company_name = result["result"]["subject"]["name"]
 
             Group(name=company_name).save()
             Company(
