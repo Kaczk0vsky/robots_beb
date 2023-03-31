@@ -1,6 +1,4 @@
 # robots_ecotruck
-Project written as recruitment task for Ecotruck Diagnosis.
-
 ## Description
 Every client for my company has robots that are moving around. Each of those robots carry communication device. Those communication devices have two types: location and telemetry. Each one of them is sending data specified for it's type. Data is beeing sent on MQTT server and each robot has it's own topic. Models can be seen through django administration panel. Admin view allows to modify almost everything inside robots, starting with its parameters and moving communication devices and ending on adding additional company's or changing sensor's logs. User view allows only to view robots that belong to logged in company. 
 
